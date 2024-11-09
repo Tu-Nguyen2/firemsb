@@ -1,19 +1,15 @@
-* {
-    box-sizing: border-box;
+/* Make sure html and body take the full height and allow flex centering */
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7f7f7;
     font-family: 'Arial', sans-serif;
 }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f7f7f7;
-}
-
-/* General container for authentication pages */
+/* Centered container for login and register */
 .auth-container {
     background-color: #fff;
     padding: 40px;
@@ -21,9 +17,12 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     width: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+    
 }
 
-/* General form styling for authentication */
+/* Form styling */
 .auth-form {
     display: flex;
     flex-direction: column;
