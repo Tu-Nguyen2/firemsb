@@ -52,7 +52,6 @@ def convert_to_mp4(input_file, output_file=None):
 
 
 def slow_down_video(input_video, output_video=None, slow_factor=0.4):
-    # Set the default output video name if not provided
     if output_video is None:
         output_video = input_video.rsplit('.', 1)[0] + '_slowed.mp4'
 
@@ -70,7 +69,7 @@ def slow_down_video(input_video, output_video=None, slow_factor=0.4):
 
 def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, model_path, frame_skip=6, handedness="right"):
     # Load YOLO model
-    model = YOLO(model_path).to('cpu')  # Run on CPU to avoid MPS issues
+    model = YOLO(model_path).to('cpu')  # Run on CPU if Mac, else .to('cpu') not needed
 
     # Open video and get properties
     cap = cv2.VideoCapture(input_video)
@@ -80,7 +79,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
 
     print(f"Input video properties - FPS: {input_fps}, Width: {width}, Height: {height}")
 
-    fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    fourcc = cv2.VideoWriter_fourcc(*'avc1') #may need to adjust encoder
     output_directory = os.path.dirname(output_video)
     os.makedirs(output_directory, exist_ok=True)
     out = cv2.VideoWriter(output_video, fourcc, input_fps, (width, height))
