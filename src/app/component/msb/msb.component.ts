@@ -1,40 +1,69 @@
 import { Component } from '@angular/core';
 import { FirebaseService } from '../../services/firebase.service';
-import { SidebarComponent } from '../sidebar/sidebar.component';
-
 
 @Component({
   selector: 'app-msb',
   templateUrl: './msb.component.html',
-  styleUrl: './msb.component.css'
+  styleUrls: ['./msb.component.css']
 })
 export class MsbComponent {
+  videoTitle: string = '';
+  selectedFile: File | null = null;
+  notes: string = '';
+  clubType: string = '';
+  handedness: string = '';
+  videoGallery: Array<{ title: string; url: string }> = [];
+
   constructor(private firebaseService: FirebaseService) {}
-  // Upload video and metadata example function
-  uploadVideo(file: File, userId: string, notes: string, clubType: string, handedness: string) {
+
+  // Handles file selection
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
+  }
+
+  // Upload video and metadata, display in gallery
+uploadVideo(userId: string): void {
+  if (this.selectedFile && this.videoTitle.trim() && this.notes.trim() && this.clubType && this.handedness) {
     // Upload the original video
-    this.firebaseService.uploadVideo(userId, file, false).subscribe(video1Url => {
+    this.firebaseService.uploadVideo(userId, this.selectedFile!, false).subscribe(video1Url => {
       // Upload the processed video
-      this.firebaseService.uploadVideo(userId, file, true).subscribe(videoProcessedUrl => {
+      this.firebaseService.uploadVideo(userId, this.selectedFile!, true).subscribe(videoProcessedUrl => {
+        // Prepare video metadata
         const videoData = {
           video1Url,
           videoProcessedUrl,
-          notes,
-          clubType,
-          handedness
+          title: this.videoTitle,
+          notes: this.notes,
+          clubType: this.clubType,
+          handedness: this.handedness
         };
-
 
         const videoId = this.firebaseService.generateId(); // Generate unique ID for video metadata
         this.firebaseService.saveVideoMetadata(userId, videoId, videoData).then(() => {
           console.log("Video metadata saved successfully!");
+
+          // Add video to the gallery
+          this.videoGallery.push({ title: this.videoTitle, url: video1Url });
+
+          // Clear input fields
+          this.selectedFile = null;
+          this.videoTitle = '';
+          this.notes = '';
+          this.clubType = '';
+          this.handedness = '';
         });
       });
     });
+  } else {
+    alert("Please complete all fields and select a video.");
   }
+}
 
 
-  // Example function to retrieve videos
+  // Retrieve and display user videos
   getUserVideos(userId: string) {
     this.firebaseService.getUserVideos(userId).subscribe(videos => {
       console.log(videos); // Replace with code to display videos in your template

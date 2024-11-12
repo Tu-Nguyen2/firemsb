@@ -11,22 +11,32 @@
         <h1>Upload Your Video</h1>
 
         <!-- Video Upload Form -->
-        <form id="upload-form">
-            <input type="file" id="videoInput" accept="video/*">
-            <input type="text" id="videoTitle" placeholder="Enter Video Title">
-            <button type="button" id="uploadButton">Upload</button>
+        <form (submit)="uploadVideo('user-id'); $event.preventDefault()">
+            <!-- File input for video upload -->
+            <input type="file" (change)="onFileSelected($event)" accept="video/*">
+
+            <!-- Text inputs for video metadata -->
+            <input type="text" [(ngModel)]="videoTitle" placeholder="Enter Video Title">
+            <input type="text" [(ngModel)]="notes" placeholder="Enter Notes">
+            <input type="text" [(ngModel)]="clubType" placeholder="Enter Club Type (e.g., driver or iron)">
+            <input type="text" [(ngModel)]="handedness" placeholder="Enter Handedness (e.g., left or right)">
+
+            <!-- Upload button to trigger uploadVideo method -->
+            <button type="button" (click)="uploadVideo('user-id')">Upload Video</button>
         </form>
 
         <!-- Video Gallery Section -->
         <div id="videoGallery" class="video-gallery">
-            <!-- Uploaded videos will appear here -->
+            <!-- Display each uploaded video and title -->
+            <div *ngFor="let video of videoGallery" class="video-container">
+                <video [src]="video.url" controls></video>h
+                <p class="video-title">{{ video.title }}</p>
+            </div>
         </div>
     </div>
 
-    <!-- Include external JavaScript file -->
-    <script src="script.js"></script>
+    <!-- Sidebar Component -->
+    <app-sidebar></app-sidebar>
 </body>
 </html>
 
-
-<app-sidebar></app-sidebar>
