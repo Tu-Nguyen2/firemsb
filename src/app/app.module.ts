@@ -14,12 +14,15 @@ import { RegisterComponent } from './component/register/register.component';
 import { environment } from '../environments/environment.development';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
+import { MsbComponent } from './component/msb/msb.component';
+import { SidebarComponent } from './component/sidebar/sidebar.component';
 
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+  { path: 'msb', component: MsbComponent},
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
 
 
@@ -27,7 +30,9 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    MsbComponent,
+    SidebarComponent
   ],
   imports: [
     BrowserModule,
