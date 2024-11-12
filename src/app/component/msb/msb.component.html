@@ -11,25 +11,25 @@
         <h1>Upload Your Video</h1>
 
         <!-- Video Upload Form -->
-        <form (submit)="uploadVideo('user-id'); $event.preventDefault()">
+        <form (submit)="uploadVideo(); $event.preventDefault()">
             <!-- File input for video upload -->
-            <input type="file" (change)="onFileSelected($event)" accept="video/*">
+            <input type="file" (change)="onFileSelected($event)" accept="video/*" name="videoFile">
 
             <!-- Text inputs for video metadata -->
-            <input type="text" [(ngModel)]="videoTitle" placeholder="Enter Video Title">
-            <input type="text" [(ngModel)]="notes" placeholder="Enter Notes">
-            <input type="text" [(ngModel)]="clubType" placeholder="Enter Club Type (e.g., driver or iron)">
-            <input type="text" [(ngModel)]="handedness" placeholder="Enter Handedness (e.g., left or right)">
+            <input type="text" [(ngModel)]="videoTitle" placeholder="Enter Video Title" name="videoTitle">
+            <input type="text" [(ngModel)]="notes" placeholder="Enter Notes" name="notes">
+            <input type="text" [(ngModel)]="clubType" placeholder="Enter Club Type (e.g., driver or iron)" name="clubType">
+            <input type="text" [(ngModel)]="handedness" placeholder="Enter Handedness (e.g., left or right)" name="handedness">
 
             <!-- Upload button to trigger uploadVideo method -->
-            <button type="button" (click)="uploadVideo('user-id')">Upload Video</button>
+            <button type="button" (click)="uploadVideo()">Upload Video</button>
         </form>
 
         <!-- Video Gallery Section -->
         <div id="videoGallery" class="video-gallery">
             <!-- Display each uploaded video and title -->
             <div *ngFor="let video of videoGallery" class="video-container">
-                <video [src]="video.url" controls></video>h
+                <video [src]="video.url" controls></video>
                 <p class="video-title">{{ video.title }}</p>
             </div>
         </div>
@@ -39,4 +39,3 @@
     <app-sidebar></app-sidebar>
 </body>
 </html>
-
