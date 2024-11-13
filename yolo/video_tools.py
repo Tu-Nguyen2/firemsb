@@ -5,6 +5,27 @@ import numpy as np
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 from ultralytics import YOLO
 
+
+def train_model():
+    model = YOLO('models/best.pt')
+
+    model.train(
+        data='configs/data.yaml',
+        epochs=150,            
+        imgsz=960,              
+        batch=8,                
+        name='myswingbuddy',  #rename each model
+        device='mps', #CHANGE IF NOT USING M CHIP FROM APPLE
+        project='./runs/detect',
+        amp=True,
+        cos_lr=True,
+        lr0=0.003,
+        auto_augment=True,
+        mosaic=0.5,
+        mixup=0.05,
+        copy_paste=0.05
+    )
+
 def convert_to_mp4(input_file, output_file=None):
     if output_file is None:
         output_file = input_file.rsplit(".", 1)[0] + ".mp4"

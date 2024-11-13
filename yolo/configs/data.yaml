@@ -1,0 +1,10 @@
+path: ./data
+
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: Club Head
+  1: Driver
+  2: Iron
