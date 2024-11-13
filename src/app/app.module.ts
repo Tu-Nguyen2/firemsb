@@ -25,6 +25,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'msb', component: MsbComponent},
+  { path: 'profile', component: ProfileComponent},
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];
 
