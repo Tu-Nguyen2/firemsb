@@ -16,6 +16,8 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { MsbComponent } from './component/msb/msb.component';
 import { SidebarComponent } from './component/sidebar/sidebar.component';
+import { DashboardComponent } from './component/dashboard/dashboard.component';
+import { ProfileComponent } from './component/profile/profile.component';
 
 
 const routes: Routes = [
@@ -32,7 +34,9 @@ const routes: Routes = [
     LoginComponent,
     RegisterComponent,
     MsbComponent,
-    SidebarComponent
+    SidebarComponent,
+    DashboardComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
