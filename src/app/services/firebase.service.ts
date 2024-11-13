@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { AngularFireAuth } from '@angular/fire/compat/auth'; // Import AngularFireAuth
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
@@ -11,7 +12,8 @@ export class FirebaseService {
 
   constructor(
     private firestore: AngularFirestore,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private afAuth: AngularFireAuth // Inject AngularFireAuth for authentication
   ) {}
 
   // Method to generate a unique Firestore ID
@@ -44,6 +46,7 @@ export class FirebaseService {
 
   // Retrieves video metadata for a specific user
   getUserVideos(userId: string): Observable<any[]> {
+    // Assuming videos are stored under a user collection
     return this.firestore.collection(`users/${userId}/videos`).valueChanges();
   }
 
@@ -55,4 +58,10 @@ export class FirebaseService {
   getProfile(userId: string): Observable<any> {
     return this.firestore.collection(`users/${userId}/profile`).doc('profileData').valueChanges();
   }
+
+  // Fetch videos for a specific user based on userId
+  getUserVideosByUserId(userId: string): Observable<any[]> {
+    return this.firestore.collection('videos', ref => ref.where('userId', '==', userId)).valueChanges();
+  }
+
 }

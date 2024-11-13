@@ -1,0 +1,52 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Dropdown and Video Display */
+.video-selection {
+    margin: 20px 0;
+}
+
+.video-selection label {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+#videoDropdown {
+    padding: 8px;
+    font-size: 16px;
+}
+
+.video-display {
+    margin-top: 20px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+video {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.video-title {
+    font-size: 18px;
+    color: #333;
+    margin-top: 10px;
+}

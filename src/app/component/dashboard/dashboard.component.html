@@ -1,1 +1,35 @@
-<p>dashboard works!</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="./dashboard.component.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Your Uploaded Videos</h1>
+
+        <!-- Video Selection Dropdown -->
+        <div class="video-selection">
+            <label for="videoDropdown">Select a Video:</label>
+            <select id="videoDropdown" [(ngModel)]="selectedVideoUrl" (change)="onVideoSelected()">
+                <option value="" disabled selected>Select a video</option>
+                <option *ngFor="let video of videoList" [value]="video.url">{{ video.title }}</option>
+            </select>
+        </div>
+
+        <!-- Display Selected Video -->
+        <div *ngIf="selectedVideoUrl" class="video-container">
+            <video *ngIf="selectedVideoUrl" [src]="selectedVideoUrl" controls width="100%">
+                Your browser does not support the video tag.
+            </video>
+            <p class="video-title">{{ selectedVideoTitle }}</p>
+        </div>
+    </div>
+    
+
+    <!-- Sidebar Component -->
+    <app-sidebar></app-sidebar>
+</body>
+</html>
