@@ -25,7 +25,7 @@
 
         <!-- Display Video Section, only if a video is uploaded -->
         <div *ngIf="displayedVideo" class="video-container">
-            <video [src]="displayedVideo.url" controls></video>
+            <video [src]="displayedVideo.rawvideourl" controls></video>
             <p class="video-title">{{ displayedVideo.title }}</p>
         </div>
     </div>

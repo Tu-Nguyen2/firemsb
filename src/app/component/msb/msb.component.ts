@@ -8,12 +8,14 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
   styleUrls: ['./msb.component.css']
 })
 export class MsbComponent {
-  @ViewChild('fileInput') fileInput: ElementRef | null = null; // Reference to file input
+  @ViewChild('fileInput') fileInput: ElementRef | null = null;
 
   videoTitle: string = '';
   selectedFile: File | null = null;
   handedness: string = '';
-  displayedVideo: { title: string; url: string } | null = null;
+  clubType: string = '';
+  notes: string = '';
+  displayedVideo: { title: string; rawvideourl: string } | null = null;
   userId: string | null = null;
 
   constructor(private firebaseService: FirebaseService, private afAuth: AngularFireAuth) {
@@ -35,23 +37,41 @@ export class MsbComponent {
   // Upload video and set it as the currently displayed video
   uploadVideo(): void {
     if (this.selectedFile && this.videoTitle.trim() && this.handedness && this.userId) {
+      // Step 1: Upload video to Firebase Storage
       this.firebaseService.uploadVideo(this.userId, this.selectedFile, false).subscribe({
-        next: (videoUrl) => {
+        next: (rawVideoUrl) => {
+          console.log("Raw video uploaded to Firebase Storage:", rawVideoUrl);
+
+          // Step 2: Prepare metadata to save to Firestore
           const videoData = {
             title: this.videoTitle,
-            url: videoUrl,
+            handedness: this.handedness,
+            clubtype: "",
+            notes: "",
+            rawvideourl: rawVideoUrl,     // URL of the raw video in Firebase Storage
+            videoprocessedurl: '',        // Initialize as an empty string, to be updated after processing
           };
 
-          // Display this video as the currently displayed video
-          this.displayedVideo = videoData;
+          // Step 3: Save metadata to Firestore
+          const videoId = this.firebaseService.generateId();
+          this.firebaseService.saveVideoMetadata(this.userId!, videoId, videoData).then(() => {
+            console.log("Video metadata saved to Firestore");
 
-          // Reset file input and other fields for the next upload
-          this.selectedFile = null;
-          this.videoTitle = '';
-          this.handedness = '';
-          if (this.fileInput) {
-            this.fileInput.nativeElement.value = ''; // Clear file input
-          }
+            // Display the raw video as the currently displayed video
+            this.displayedVideo = { title: this.videoTitle, rawvideourl: rawVideoUrl };
+
+            // Reset file input and other fields for the next upload
+            this.selectedFile = null;
+            this.videoTitle = '';
+            this.handedness = '';
+            this.clubType = '';
+            this.notes = '';
+            if (this.fileInput) {
+              this.fileInput.nativeElement.value = ''; // Clear file input
+            }
+          }).catch((error) => {
+            console.error("Error saving video metadata to Firestore:", error);
+          });
         },
         error: (error) => {
           console.error("Error uploading video:", error);
