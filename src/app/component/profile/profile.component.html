@@ -1,1 +1,41 @@
-<p>profile works!</p>
+<!-- profile.component.html -->
+<div class="container">
+    <h2>Update Profile</h2>
+  
+    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <!-- Driver Brand -->
+      <label for="driverBrand">Driver Brand:</label>
+      <input id="driverBrand" type="text" formControlName="driverBrand">
+  
+      <!-- First Name -->
+      <label for="firstName">First Name:</label>
+      <input id="firstName" type="text" formControlName="firstName">
+  
+      <!-- Height -->
+      <label for="height">Height:</label>
+      <input id="height" type="text" formControlName="height">
+  
+      <!-- Iron Brand -->
+      <label for="ironBrand">Iron Brand:</label>
+      <input id="ironBrand" type="text" formControlName="ironBrand">
+  
+      <!-- Last Name -->
+      <label for="lastName">Last Name:</label>
+      <input id="lastName" type="text" formControlName="lastName">
+  
+      <!-- Picture URL -->
+      <label for="pic">Picture URL:</label>
+      <input id="pic" type="text" formControlName="pic">
+  
+      <!-- Wedge Brand -->
+      <label for="wedgeBrand">Wedge Brand:</label>
+      <input id="wedgeBrand" type="text" formControlName="wedgeBrand">
+  
+      <!-- Wrist to Floor -->
+      <label for="wristToFloor">Wrist to Floor:</label>
+      <input id="wristToFloor" type="text" formControlName="wristToFloor">
+  
+      <button type="submit">Save Profile</button>
+    </form>
+  </div>
+  
