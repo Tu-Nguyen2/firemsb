@@ -21,6 +21,7 @@ import { ProfileComponent } from './component/profile/profile.component';
 
 
 const routes: Routes = [
+  { path: 'dashboard', component: DashboardComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'msb', component: MsbComponent},
