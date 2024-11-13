@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FirebaseService } from '../../services/firebase.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-
 
 @Component({
   selector: 'app-msb',
@@ -9,17 +8,15 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
   styleUrls: ['./msb.component.css']
 })
 export class MsbComponent {
+  @ViewChild('fileInput') fileInput: ElementRef | null = null; // Reference to file input
+
   videoTitle: string = '';
   selectedFile: File | null = null;
-  notes: string = '';
-  clubType: string = '';
   handedness: string = '';
-  videoGallery: Array<{ title: string; url: string }> = [];
-  userId: string | null = null;  // Store authenticated user's UID
-
+  displayedVideo: { title: string; url: string } | null = null;
+  userId: string | null = null;
 
   constructor(private firebaseService: FirebaseService, private afAuth: AngularFireAuth) {
-    // Get the authenticated user's UID
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
@@ -35,63 +32,33 @@ export class MsbComponent {
     }
   }
 
-// Upload video and metadata, display in gallery
-uploadVideo(): void {
-  if (this.selectedFile && this.videoTitle.trim() && this.notes.trim() && this.clubType && this.handedness && this.userId) {
-    console.log("Attempting upload with user ID:", this.userId); // Log the user ID
+  // Upload video and set it as the currently displayed video
+  uploadVideo(): void {
+    if (this.selectedFile && this.videoTitle.trim() && this.handedness && this.userId) {
+      this.firebaseService.uploadVideo(this.userId, this.selectedFile, false).subscribe({
+        next: (videoUrl) => {
+          const videoData = {
+            title: this.videoTitle,
+            url: videoUrl,
+          };
 
-    // Upload the original video
-    this.firebaseService.uploadVideo(this.userId, this.selectedFile!, false).subscribe({
-      next: (video1Url) => {
-        console.log("Original video uploaded:", video1Url);
-        
-        // Upload the processed video
-        this.firebaseService.uploadVideo(this.userId!, this.selectedFile!, true).subscribe({
-          next: (videoProcessedUrl) => {
-            console.log("Processed video uploaded:", videoProcessedUrl);
+          // Display this video as the currently displayed video
+          this.displayedVideo = videoData;
 
-            const videoData = {
-              video1Url,
-              videoProcessedUrl,
-              title: this.videoTitle,
-              notes: this.notes,
-              clubType: this.clubType,
-              handedness: this.handedness
-            };
-
-            const videoId = this.firebaseService.generateId();
-            this.firebaseService.saveVideoMetadata(this.userId!, videoId, videoData).then(() => {
-              console.log("Video metadata saved successfully!");
-
-              this.videoGallery.push({ title: this.videoTitle, url: video1Url });
-
-              this.selectedFile = null;
-              this.videoTitle = '';
-              this.notes = '';
-              this.clubType = '';
-              this.handedness = '';
-            });
-          },
-          error: (error) => {
-            console.error("Error uploading processed video:", error);
+          // Reset file input and other fields for the next upload
+          this.selectedFile = null;
+          this.videoTitle = '';
+          this.handedness = '';
+          if (this.fileInput) {
+            this.fileInput.nativeElement.value = ''; // Clear file input
           }
-        });
-      },
-      error: (error) => {
-        console.error("Error uploading original video:", error);
-      }
-    });
-  } else {
-    alert("Please complete all fields and select a video.");
-  }
-}
-
-
-
-  // Retrieve and display user videos
-  getUserVideos(userId: string) {
-    this.firebaseService.getUserVideos(userId).subscribe(videos => {
-      console.log(videos); // Replace with code to display videos in your template
-    });
+        },
+        error: (error) => {
+          console.error("Error uploading video:", error);
+        }
+      });
+    } else {
+      alert("Please complete all fields and select a video.");
+    }
   }
 }
