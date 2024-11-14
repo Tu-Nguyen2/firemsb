@@ -18,21 +18,27 @@ Once the repo is cloned, `cd` into where `MySwingBuddy` is cloned. The next step
 
 `npm install -g firebase-tools` will now install the Firebase CLI, this allows us to push the project and connect an Firbase account to manage user login. This also gives acced to adding in a 
 
-With these installed, an `enviroments.ts` will need to be created.
+With these installed, an `enviroments.ts` will need to be created. In the `src` directory create a new directory called `src/enviromnet`, within here is where `enviroment.ts` will be located. Below is an example structure of how the enviroment should be setup.
 
-```typescript export const environment = { production: false, apiKey: 'your-api-key', authDomain: 'your-auth-domain', projectId: 'your-project-id', storageBucket: 'your-storage-bucket', messagingSenderId: 'your-messaging-sender-id', appId: 'your-app-id' }; ```
+```export const environment = { production: false, apiKey: 'your-api-key', authDomain: 'your-auth-domain', projectId: 'your-project-id', storageBucket: 'your-storage-bucket', messagingSenderId: 'your-messaging-sender-id', appId: 'your-app-id' }; ```
 
-Replace the placeholder values with actual configuration values. These can be obtained from the Firebase console or another backend provider as per your project’s requirements.
+Replace the placeholder values with actual configuration values. These can be obtained from the Firebase console or another backend provider as per your project’s requirements. If using this code a new application within Firebase, you will need to create a new application within the console to set up the retrieve values.
 
-Within the `src` folder there are the components and pages for the web application, these are organized by what the function of the page is and they route between eachother.
+> **Note:** If this does not work, please contact Tu-Nguyen2, or paul-pilipczuk for the specific environment being used in this project.
+
+Within the `src` folder there are the also components and pages for the web application, these are organized by what the function of the page is and they route between eachother.
 
 ### Installations and Configuration After Cloning - YOLO
 Currently the packages being used for video playback control and any transformations to the data itself can be found in `yolo`, within here `video_tools.py` contains scripts that will be used for video processing. These require Ultralytics, OpenCV, and FFmpeg in order to function these can be installed by running:
 
 `pip install opencv-python ffmpeg-python ultralytics`
 
-*Make sure that after installing these, their path setup properly and firemsb can see those pathes.
+> Make sure that after installing these, their path setup properly and firemsb can see those pathes.
 
 ## Usage
 
 Run `ng serve` for a dev server, since the project is locally hosted this will be the only way to run the project. The project will be accessable at [http://localhost:4200](http://localhost:4200).
+
+## Contributing
+
+This project was created by Tu-Nguyen2 and paul-pilipczuk. To make any contributions to the project, please reach out to either developer.
