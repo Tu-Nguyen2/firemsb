@@ -21,9 +21,9 @@
 
         <!-- Display Selected Video -->
         <div *ngIf="selectedVideoUrl" class="video-container">
-            <video *ngIf="selectedVideoUrl" [src]="selectedVideoUrl" controls width="100%">
-                Your browser does not support the video tag.
-            </video>
+            <!-- Sample template code -->
+            <video *ngIf="selectedVideoUrl" [src]="selectedVideoUrl" controls autoplay></video>
+
             <p class="video-title">{{ selectedVideoTitle }}</p>
         </div>
     </div>
