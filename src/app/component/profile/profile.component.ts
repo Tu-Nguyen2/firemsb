@@ -17,7 +17,7 @@ export class ProfileComponent implements OnInit {
     private afAuth: AngularFireAuth,
     private fb: FormBuilder
   ) {
-    //sets up all fields of form
+    
     this.profileForm = this.fb.group({
       driverBrand: [''],
       firstName: [''],

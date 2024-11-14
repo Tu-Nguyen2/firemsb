@@ -13,10 +13,9 @@ export class FirebaseService {
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
-    private afAuth: AngularFireAuth // Inject AngularFireAuth for authentication
+    private afAuth: AngularFireAuth 
   ) {}
 
-  // Method to generate a unique Firestore ID
   generateId(): string {
     return this.firestore.createId();
   }
@@ -39,14 +38,12 @@ export class FirebaseService {
     });
   }
 
-  // Stores metadata in Firestore
   saveVideoMetadata(userId: string, videoId: string, videoData: any): Promise<void> {
     return this.firestore.collection(`users/${userId}/videos`).doc(videoId).set(videoData);
   }
 
-  // Retrieves video metadata for a specific user
+  // Retrieves video metadata for a specific user, stores in collection
   getUserVideos(userId: string): Observable<any[]> {
-    // Assuming videos are stored under a user collection
     return this.firestore.collection(`users/${userId}/videos`).valueChanges();
   }
 
@@ -54,12 +51,12 @@ export class FirebaseService {
     return this.firestore.collection(`users/${userId}/profile`).doc('profileData').set(profileData, { merge: true });
   }
 
-  // Retrieves profile data for a specific user
+  // retrieves profile for a specific user
   getProfile(userId: string): Observable<any> {
     return this.firestore.collection(`users/${userId}/profile`).doc('profileData').valueChanges();
   }
 
-  // Fetch videos for a specific user based on userId
+  // fetch videos for a specific user based on userId
   getUserVideosByUserId(userId: string): Observable<any[]> {
     return this.firestore.collection('videos', ref => ref.where('userId', '==', userId)).valueChanges();
   }
