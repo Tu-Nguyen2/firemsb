@@ -17,7 +17,7 @@ export class ProfileComponent implements OnInit {
     private afAuth: AngularFireAuth,
     private fb: FormBuilder
   ) {
-    // Define the form with all fields for profile data
+    //sets up all fields of form
     this.profileForm = this.fb.group({
       driverBrand: [''],
       firstName: [''],
@@ -28,31 +28,34 @@ export class ProfileComponent implements OnInit {
       wedgeBrand: [''],
       wristToFloor: ['']
     });
-  }
 
-  ngOnInit(): void {
-    // Get the authenticated user's ID
+    //check authentication
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
-        // Load the current profile data
-        this.loadProfileData();
       }
     });
   }
 
-  // Load existing profile data into the form
+  ngOnInit(): void {
+    //load profile from THIS user
+    if (this.userId) {
+      this.loadProfileData();
+    }
+  }
+
+  //load data from user collection
   loadProfileData(): void {
     if (this.userId) {
       this.firebaseService.getProfile(this.userId).subscribe((profileData: any) => {
         if (profileData) {
-          this.profileForm.patchValue(profileData);  // Populate form with existing data
+          this.profileForm.patchValue(profileData); // Populate form with existing data
         }
       });
     }
   }
 
-  // Save profile data
+  //save the profile data under user collection
   saveProfile(): void {
     if (this.userId) {
       const profileData = this.profileForm.value;

@@ -1,41 +1,54 @@
-<!-- profile.component.html -->
 <div class="container">
-    <h2>Update Profile</h2>
+  <h2>Update Profile</h2>
   
-    <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
-      <!-- Driver Brand -->
-      <label for="driverBrand">Driver Brand:</label>
-      <input id="driverBrand" type="text" formControlName="driverBrand">
-  
-      <!-- First Name -->
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+    
+    <div class="form-row">
+      <label for="pic">Select Picture:</label>
+      <input id="pic" type="text" formControlName="pic">
+    </div>
+
+    <div class="form-row">
       <label for="firstName">First Name:</label>
       <input id="firstName" type="text" formControlName="firstName">
-  
-      <!-- Height -->
-      <label for="height">Height:</label>
-      <input id="height" type="text" formControlName="height">
-  
-      <!-- Iron Brand -->
-      <label for="ironBrand">Iron Brand:</label>
-      <input id="ironBrand" type="text" formControlName="ironBrand">
-  
-      <!-- Last Name -->
+    </div>
+
+    <div class="form-row">
       <label for="lastName">Last Name:</label>
       <input id="lastName" type="text" formControlName="lastName">
-  
-      <!-- Picture URL -->
-      <label for="pic">Picture URL:</label>
-      <input id="pic" type="text" formControlName="pic">
-  
-      <!-- Wedge Brand -->
-      <label for="wedgeBrand">Wedge Brand:</label>
-      <input id="wedgeBrand" type="text" formControlName="wedgeBrand">
-  
-      <!-- Wrist to Floor -->
+    </div>
+
+    <div class="form-row">
+      <label for="height">Height:</label>
+      <input id="height" type="text" formControlName="height">
+    </div>
+
+    <div class="form-row">
       <label for="wristToFloor">Wrist to Floor:</label>
       <input id="wristToFloor" type="text" formControlName="wristToFloor">
+    </div>
+
+    <div class="form-row">
+      <label for="ironBrand">Iron Brand:</label>
+      <input id="ironBrand" type="text" formControlName="ironBrand">
+    </div>
+
+    <div class="form-row">
+      <label for="driverBrand">Driver Brand:</label>
+      <input id="driverBrand" type="text" formControlName="driverBrand">
+    </div>
+
+    <div class="form-row">
+      <label for="wedgeBrand">Wedge Brand:</label>
+      <input id="wedgeBrand" type="text" formControlName="wedgeBrand">
+    </div>
+    
+    <!-- Centered Submit Button -->
+    <div class="form-row submit-row">
+      <button type="submit" class="submit-button">Save Profile</button>
+    </div>
+
+  </form>
   
-      <button type="submit">Save Profile</button>
-    </form>
-  </div>
-  
+  <app-sidebar></app-sidebar>
+</div>

@@ -1,0 +1,79 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+body, .container, .container * {
+    font-family: Arial, sans-serif;
+}
+
+
+h1 {
+    color: #333;
+}
+
+/* Adjust container alignment to start near the sidebar */
+.container {
+    margin-left: 260px;  /* Slightly offset from the sidebar width for spacing */
+    padding: 20px;
+    max-width: 800px; /* Restrict max-width for better readability */
+}
+
+app-sidebar {
+    position: fixed;
+    width: 250px;
+    height: 100vh;
+    left: 0;
+    top: 0;
+}
+
+/* Styling for two-column layout form */
+.profile-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+    gap: 16px;
+    align-items: center; /* Align items vertically centered */
+}
+
+/* Each form row spans one cell */
+.form-row {
+    display: contents; /* Use grid's span control for labels and inputs */
+}
+
+.form-row label {
+    text-align: right;
+    padding-right: 8px;
+    color: #555;
+}
+
+.form-row input {
+    width: 100%; /* Ensure inputs take full width of the cell */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Center the submit button across both columns */
+.submit-row {
+    grid-column: span 2;
+    display: flex;
+    justify-content: center;
+}
+
+/* Styling for submit button */
+.submit-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #45a049;
+}
