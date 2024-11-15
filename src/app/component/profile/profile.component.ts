@@ -26,7 +26,8 @@ export class ProfileComponent implements OnInit {
       lastName: [''],
       pic: [''],
       wedgeBrand: [''],
-      wristToFloor: ['']
+      wristToFloor: [''],
+      handedness: ['']
     });
   }
 
