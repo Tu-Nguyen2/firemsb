@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FirebaseService } from '../../services/firebase.service';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-profile',
@@ -15,7 +16,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private firebaseService: FirebaseService,
     private afAuth: AngularFireAuth,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private storage: AngularFireStorage
   ) {
     this.profileForm = this.fb.group({
       driverBrand: [''],
@@ -23,7 +25,7 @@ export class ProfileComponent implements OnInit {
       height: [''],
       ironBrand: [''],
       lastName: [''],
-      pic: [''],
+      pic: [''], // Will hold the URL of the uploaded image
       wedgeBrand: [''],
       wristToFloor: ['']
     });
@@ -35,7 +37,6 @@ export class ProfileComponent implements OnInit {
         this.userId = user.uid;
         this.loadProfileData();
       } else {
-        // Handle unauthenticated state
         console.error('User is not authenticated');
       }
     });
@@ -53,6 +54,25 @@ export class ProfileComponent implements OnInit {
           console.error('Error loading profile data:', error);
         }
       );
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file && this.userId) {
+      const filePath = `users/${this.userId}/profile-pic/${file.name}`;
+      const fileRef = this.storage.ref(filePath);
+
+      // Upload the file to Firebase Storage
+      this.storage.upload(filePath, file).then(() => {
+        // Retrieve the file's download URL
+        fileRef.getDownloadURL().subscribe(url => {
+          this.profileForm.patchValue({ pic: url }); // Set the URL in the form
+          console.log('File uploaded successfully. URL:', url);
+        });
+      }).catch(error => {
+        console.error('Error uploading file:', error);
+      });
     }
   }
 

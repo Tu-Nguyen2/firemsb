@@ -5,7 +5,7 @@
     
     <div class="form-row">
       <label for="pic">Select Picture:</label>
-      <input id="pic" type="text" formControlName="pic">
+      <input id="pic" type="file" (change)="onFileSelected($event)">
     </div>
 
     <div class="form-row">
