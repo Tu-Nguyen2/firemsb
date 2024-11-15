@@ -48,12 +48,16 @@ export class FirebaseService {
   }
 
   updateProfile(userId: string, profileData: any): Promise<void> {
-    return this.firestore.collection(`users/${userId}/profile`).doc('profileData').set(profileData, { merge: true });
+    return this.firestore
+      .doc(`users/${userId}/profile/${userId}`)
+      .set(profileData, { merge: true });
   }
 
   // retrieves profile for a specific user
   getProfile(userId: string): Observable<any> {
-    return this.firestore.collection(`users/${userId}/profile`).doc('profileData').valueChanges();
+    return this.firestore
+      .doc(`users/${userId}/profile/${userId}`)
+      .valueChanges();
   }
 
   // fetch videos for a specific user based on userId

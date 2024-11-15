@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FirebaseService } from '../../services/firebase.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { FirebaseService } from '../../services/firebase.service';
 
 @Component({
   selector: 'app-profile',
@@ -17,7 +17,6 @@ export class ProfileComponent implements OnInit {
     private afAuth: AngularFireAuth,
     private fb: FormBuilder
   ) {
-    
     this.profileForm = this.fb.group({
       driverBrand: [''],
       firstName: [''],
@@ -28,40 +27,43 @@ export class ProfileComponent implements OnInit {
       wedgeBrand: [''],
       wristToFloor: ['']
     });
+  }
 
-    //check authentication
+  ngOnInit(): void {
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
+        this.loadProfileData();
+      } else {
+        // Handle unauthenticated state
+        console.error('User is not authenticated');
       }
     });
   }
 
-  ngOnInit(): void {
-    //load profile from THIS user
-    if (this.userId) {
-      this.loadProfileData();
-    }
-  }
-
-  //load data from user collection
   loadProfileData(): void {
     if (this.userId) {
-      this.firebaseService.getProfile(this.userId).subscribe((profileData: any) => {
-        if (profileData) {
-          this.profileForm.patchValue(profileData); // Populate form with existing data
+      this.firebaseService.getProfile(this.userId).subscribe(
+        (profileData: any) => {
+          if (profileData) {
+            this.profileForm.patchValue(profileData);
+          }
+        },
+        error => {
+          console.error('Error loading profile data:', error);
         }
-      });
+      );
     }
   }
 
-  //save the profile data under user collection
   saveProfile(): void {
     if (this.userId) {
       const profileData = this.profileForm.value;
       this.firebaseService.updateProfile(this.userId, profileData)
         .then(() => console.log('Profile updated successfully'))
-        .catch((error) => console.error('Error updating profile:', error));
+        .catch(error => console.error('Error updating profile:', error));
+    } else {
+      console.error('User ID is null. Cannot save profile.');
     }
   }
 }
