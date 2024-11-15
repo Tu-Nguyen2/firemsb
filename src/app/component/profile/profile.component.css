@@ -71,3 +71,36 @@ app-sidebar {
 .submit-button:hover {
     background-color: #45a049;
 }
+.profile-picture-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+.profile-picture {
+width: 150px;
+height: 150px;
+border-radius: 50%;
+object-fit: cover;
+margin-right: 20px;
+}
+
+.change-picture {
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+.change-button {
+padding: 10px 20px;
+background-color: #4CAF50;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+.change-button:hover {
+background-color: #45a049;
+}
+  

@@ -59,6 +59,15 @@ export class FirebaseService {
       .doc(`users/${userId}/profile/${userId}`)
       .valueChanges();
   }
+  
+  uploadProfilePicture(userId: string, file: File): Promise<string> {
+    const filePath = `users/${userId}/profile-picture/${file.name}`;
+    const fileRef = this.storage.ref(filePath);
+    return this.storage.upload(filePath, file).then(() => {
+      return fileRef.getDownloadURL().toPromise();
+    });
+  }
+  
 
   // fetch videos for a specific user based on userId
   getUserVideosByUserId(userId: string): Observable<any[]> {

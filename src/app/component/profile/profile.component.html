@@ -1,54 +1,48 @@
 <div class="container">
   <h2>Update Profile</h2>
-  
-  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
-    
-    <div class="form-row">
-      <label for="pic">Select Picture:</label>
-      <input id="pic" type="file" (change)="onFileSelected($event)">
+  <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+    <!-- Profile Picture Section -->
+    <div class="profile-picture-section">
+      <img
+        *ngIf="profilePicUrl; else noPicture"
+        [src]="profilePicUrl"
+        alt="Profile Picture"
+        class="profile-picture"
+      />
+      <ng-template #noPicture>
+        <p>No picture selected</p>
+      </ng-template>
+      <div class="change-picture">
+        <label for="picUpload" class="change-button">Change Picture</label>
+        <input id="picUpload" type="file" (change)="onFileSelected($event)" hidden>
+      </div>
     </div>
 
-    <div class="form-row">
+    <!-- Other Profile Fields -->
+    <div class="profile-form">
       <label for="firstName">First Name:</label>
       <input id="firstName" type="text" formControlName="firstName">
-    </div>
 
-    <div class="form-row">
       <label for="lastName">Last Name:</label>
       <input id="lastName" type="text" formControlName="lastName">
-    </div>
 
-    <div class="form-row">
       <label for="height">Height:</label>
       <input id="height" type="text" formControlName="height">
-    </div>
 
-    <div class="form-row">
       <label for="wristToFloor">Wrist to Floor:</label>
       <input id="wristToFloor" type="text" formControlName="wristToFloor">
-    </div>
 
-    <div class="form-row">
       <label for="ironBrand">Iron Brand:</label>
       <input id="ironBrand" type="text" formControlName="ironBrand">
-    </div>
 
-    <div class="form-row">
       <label for="driverBrand">Driver Brand:</label>
       <input id="driverBrand" type="text" formControlName="driverBrand">
-    </div>
 
-    <div class="form-row">
       <label for="wedgeBrand">Wedge Brand:</label>
       <input id="wedgeBrand" type="text" formControlName="wedgeBrand">
     </div>
-    
-    <!-- Centered Submit Button -->
-    <div class="form-row submit-row">
-      <button type="submit" class="submit-button">Save Profile</button>
-    </div>
 
+    <button type="submit" class="submit-button">Save Profile</button>
   </form>
-  
   <app-sidebar></app-sidebar>
 </div>

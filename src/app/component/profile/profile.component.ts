@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { FirebaseService } from '../../services/firebase.service';
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 
 @Component({
   selector: 'app-profile',
@@ -12,12 +11,12 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
   userId: string | null = null;
+  profilePicUrl: string | null = null;
 
   constructor(
     private firebaseService: FirebaseService,
     private afAuth: AngularFireAuth,
-    private fb: FormBuilder,
-    private storage: AngularFireStorage
+    private fb: FormBuilder
   ) {
     this.profileForm = this.fb.group({
       driverBrand: [''],
@@ -25,7 +24,7 @@ export class ProfileComponent implements OnInit {
       height: [''],
       ironBrand: [''],
       lastName: [''],
-      pic: [''], // Will hold the URL of the uploaded image
+      pic: [''],
       wedgeBrand: [''],
       wristToFloor: ['']
     });
@@ -48,31 +47,13 @@ export class ProfileComponent implements OnInit {
         (profileData: any) => {
           if (profileData) {
             this.profileForm.patchValue(profileData);
+            this.profilePicUrl = profileData.pic || null;
           }
         },
         error => {
           console.error('Error loading profile data:', error);
         }
       );
-    }
-  }
-
-  onFileSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file && this.userId) {
-      const filePath = `users/${this.userId}/profile-pic/${file.name}`;
-      const fileRef = this.storage.ref(filePath);
-
-      // Upload the file to Firebase Storage
-      this.storage.upload(filePath, file).then(() => {
-        // Retrieve the file's download URL
-        fileRef.getDownloadURL().subscribe(url => {
-          this.profileForm.patchValue({ pic: url }); // Set the URL in the form
-          console.log('File uploaded successfully. URL:', url);
-        });
-      }).catch(error => {
-        console.error('Error uploading file:', error);
-      });
     }
   }
 
@@ -84,6 +65,20 @@ export class ProfileComponent implements OnInit {
         .catch(error => console.error('Error updating profile:', error));
     } else {
       console.error('User ID is null. Cannot save profile.');
+    }
+  }
+
+  // Handle file selection for changing profile picture
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file && this.userId) {
+      this.firebaseService.uploadProfilePicture(this.userId, file).then((downloadUrl) => {
+        this.profilePicUrl = downloadUrl;
+        this.profileForm.patchValue({ pic: downloadUrl });
+        this.saveProfile();
+      }).catch(error => {
+        console.error('Error uploading profile picture:', error);
+      });
     }
   }
 }
