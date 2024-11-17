@@ -33,13 +33,13 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<void> {
     try {
-      const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
-      this.router.navigate(['/']);
+      // Attempt to sign in
+      await this.afAuth.signInWithEmailAndPassword(email, password);
     } catch (error: any) {
-      console.error("Error during login: ", error.message);
-      alert(error.message); // Optional: Show error to user
+      // Throw the error back to the caller (login component)
+      throw new Error(error.message);
     }
   }
 

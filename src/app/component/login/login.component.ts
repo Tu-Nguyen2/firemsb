@@ -10,17 +10,18 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   email = '';
   password = '';
+  errorMessage: string | null = null;
 
   constructor(private authService: AuthService, private router: Router) { }
 
-  login() {
-    // Assume the AuthService handles login and returns a promise or observable
-    this.authService.login(this.email, this.password).then(() => {
-      // Redirect to the msb page on successful login
+  async login() {
+    try {
+      await this.authService.login(this.email, this.password);
+      
       this.router.navigate(['/msb']);
-    }).catch(error => {
-      console.error('Login failed:', error);
-      // Handle login failure (show error message, etc.)
-    });
+    } catch (error: any) {
+      console.error('Login failed:', error.message);
+      this.errorMessage = error.message || 'Login failed, please check credentials'; // Display the error message to the user
+    }
   }
 }
