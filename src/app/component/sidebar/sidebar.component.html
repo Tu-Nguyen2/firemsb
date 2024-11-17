@@ -9,7 +9,15 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2>Menu</h2>
+        <div class="menu-header">
+            <h2>Menu</h2>
+            <img 
+                *ngIf="profilePicUrl" 
+                [src]="profilePicUrl" 
+                alt="Profile Picture" 
+                class="profile-pic">
+            <div *ngIf="!profilePicUrl" class="placeholder-text">No Picture</div>
+        </div>
         <ul>
             <li><a routerLink="/dashboard">Dashboard</a></li>
             <li><a routerLink="/msb">Upload</a></li>
@@ -17,5 +25,4 @@
             <li><a (click)="logout()">Logout</a></li>
         </ul>
     </div>
-</body>
-</html>
+    
