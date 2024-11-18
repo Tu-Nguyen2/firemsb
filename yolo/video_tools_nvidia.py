@@ -70,8 +70,7 @@ def slow_down_video(input_video, output_video=None, slow_factor=0.4):
     print(f"Slowed down video saved as: {output_video}")
 
 
-def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, model_path, frame_skip=6,
-                                                 handedness="right"):
+def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, model_path, frame_skip=6,handedness="right"):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model = YOLO(model_path).to(device)
 
@@ -191,10 +190,10 @@ if __name__ == "__main__":
 
     # slowed_video_path = '/Users/paul/PycharmProjects/YOLOtests/fieldvideos/IMG_0406_slowed.mp4'
     #convert_to_mp4("./fieldvideos/IMG_0401.mov")
-    output_video_path = r'C:\Users\Paul\Desktop\YOLOtests\output\2_1_3test.mp4'
-    model_path = './runs/detect/myswingbuddyV2_1_3/weights/best.pt'
+    output_video_path = r'C:\Users\Paul\Desktop\YOLOtests\output\2_1_3test.mp4' #specify the output location here
+    model_path = './models/myswingbuddyV2_best/weights/best.pt'
 
-    input_video_path = r'C:\Users\Paul\Desktop\YOLOtests\fieldvideos\IMG_0401.mp4'
+    input_video_path = r'C:\Users\Paul\Desktop\YOLOtests\fieldvideos\IMG_0401.mp4' #specify where the video is located here
     # # Apply slowdown to the input video
     # slow_down_video(input_video_path, slowed_video_path, slow_factor=0.4)
 

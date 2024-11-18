@@ -191,7 +191,7 @@ if __name__ == "__main__":
     # slowed_video_path = './fieldvideos/IMG_0406_slowed.mp4'
     # convert_to_mp4("./fieldvideos/IMG_0407.mov")
     output_video_path = '/Users/paul/PycharmProjects/YOLOtests/output/myswingbuddytestcolor2.mp4'
-    model_path = './models/best.pt'
+    model_path = './models/myswingbuddyV2_best/weights/best.pt'
 
     input_video_path = './fieldvideos/IMG_0391.mp4' # replace with the location in firestore
     # # Apply slowdown to the input video
