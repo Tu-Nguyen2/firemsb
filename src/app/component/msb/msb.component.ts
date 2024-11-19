@@ -54,11 +54,12 @@ export class MsbComponent {
               // Step 3: Prepare metadata for Firestore
               const videoData = {
                 title: this.videoTitle.trim(),
-                handedness, // Always store as lowercase
-                clubtype: '', // Removed as per request
-                notes: '',   // Removed as per request
+                handedness: handedness, // from the profile
+                clubtype: '',  //response from flask
+                notes: '',  //populated in dash
                 rawvideourl: rawVideoUrl,
-                videoprocessedurl: '', // Initialized empty
+                videoprocessedurl: '', // response from flask
+                wtps: '', // will be populated in dash
               };
 
               // Step 4: Save metadata to Firestore
