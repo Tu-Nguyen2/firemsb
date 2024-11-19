@@ -18,15 +18,17 @@ import { MsbComponent } from './component/msb/msb.component';
 import { SidebarComponent } from './component/sidebar/sidebar.component';
 import { DashboardComponent } from './component/dashboard/dashboard.component';
 import { ProfileComponent } from './component/profile/profile.component';
-
+import { AuthGuard } from './auth.guard';
+import { HomeComponent } from './component/home/home.component'; // Import your Auth Guard
 
 const routes: Routes = [
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'msb', component: MsbComponent},
-  { path: 'profile', component: ProfileComponent},
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },   // Login page does not need AuthGuard
+  { path: 'register', component: RegisterComponent },  // Register page does not need AuthGuard
+  { path: 'home', component: HomeComponent },  // Home page does not need AuthGuard
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },  // Protected route
+  { path: 'msb', component: MsbComponent, canActivate: [AuthGuard] },  // Protected route
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },  // Protected route
+  { path: '', redirectTo: '/home', pathMatch: 'full' },  // Default redirect to home page
 ];
 
 
@@ -39,6 +41,7 @@ const routes: Routes = [
     SidebarComponent,
     DashboardComponent,
     ProfileComponent,
+    HomeComponent,
   ],
   imports: [
     BrowserModule,

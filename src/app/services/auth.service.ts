@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -48,4 +49,19 @@ export class AuthService {
     await this.afAuth.signOut();
     this.router.navigate(['/login']);
   }
+
+  // Check if the user is logged in (but wait until authState is ready)
+  isLoggedIn(): Observable<boolean> {
+    return new Observable(observer => {
+      this.afAuth.authState.subscribe(user => {
+        if (user === null) {
+          observer.next(false);  // If no user is logged in, send false
+        } else {
+          observer.next(true);  // If the user is logged in, send true
+        }
+      });
+    });
+  }
+
+  // Other methods (login, register, logout, etc.)
 }
