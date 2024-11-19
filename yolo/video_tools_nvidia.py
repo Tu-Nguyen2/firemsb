@@ -45,12 +45,12 @@ def convert_to_mp4(input_file, output_file=None):
             acodec='aac'       # Ensure audio is in AAC format for compatibility
         ).run()
 
-    # Delete the original MOV file after conversion
-    if os.path.exists(input_file):
-        os.remove(input_file)
-        print(f"Deleted the original file: {input_file}")
-    else:
-        print(f"File {input_file} not found, unable to delete.")
+    # # Delete the original MOV file after conversion   No longer need to delete
+    # if os.path.exists(input_file):
+    #     os.remove(input_file)
+    #     print(f"Deleted the original file: {input_file}")
+    # else:
+    #     print(f"File {input_file} not found, unable to delete.")
 
 
 def slow_down_video(input_video, output_video=None, slow_factor=0.4):
@@ -169,11 +169,11 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
     print("Finished synthesizing video with gradually drawn trajectory and saved to:", output_video)
 
     if driver_count > iron_count:
-        print("Driver")
+        return "Driver"
     elif iron_count > driver_count:
-        print("Iron")
+        return "Iron"
     else:
-        print("Uncertain (equal counts or no detections)")
+        return "Uncertain (equal counts or no detections)"
 
 if __name__ == "__main__":
 
