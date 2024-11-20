@@ -52,7 +52,7 @@ export class SidebarComponent {
     // Call the AuthService to handle logout
     this.authService.logout().then(() => {
       // Redirect to the login page after logout
-      this.router.navigate(['/login']);
+      this.router.navigate(['/home']);
     }).catch(error => {
       console.error('Logout failed:', error);
       // Optionally, handle any errors that occur during logout

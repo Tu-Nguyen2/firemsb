@@ -12,10 +12,10 @@ export class AppComponent {
   constructor(private afAuth: AngularFireAuth, private router: Router) {}
 
   ngOnInit(): void {
-    this.afAuth.authState.subscribe(user => {
-      if (!user) {
-        this.router.navigate(['/login']); // Redirect unauthenticated users
-      }
-    });
+    // this.afAuth.authState.subscribe(user => {
+    //   if (!user) {
+    //     this.router.navigate(['/login']); // Redirect unauthenticated users
+    //   }
+    // });
   }
 }
