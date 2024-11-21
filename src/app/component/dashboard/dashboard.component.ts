@@ -9,9 +9,17 @@ import { ChangeDetectorRef } from '@angular/core';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  videoList: Array<{ title: string; url: string }> = [];  // Array to hold video data
+  videoList: Array<{ 
+    title: string; 
+    url: string; 
+    notes: string; 
+    prosText: string; 
+  }> = [];  // Array to hold video data with metadata
+  
   selectedVideoUrl: string | null = null;  // Store URL of selected video
   selectedVideoTitle: string | null = null;  // Store title of selected video
+  notes: string = '';  // Store current notes
+  prosText: string = '';  // Store "What the Pros Say"
   userId: string | null = null;  // Store the current user's ID
 
   constructor(
@@ -34,12 +42,14 @@ export class DashboardComponent implements OnInit {
   getUserVideos(): void {
     if (this.userId) {
       this.firebaseService.getUserVideos(this.userId).subscribe((videos) => {
-        // Map each video to ensure url is properly set
+        // Map each video to ensure url, notes, and prosText are properly set
         this.videoList = videos.map(video => {
           console.log("Video data from Firebase:", video); // Debugging each video object
           return {
             url: video.videoprocessedurl || video.rawvideourl || '',  // Fallback to rawvideourl if videoprocessedurl is empty
-            title: video.title || 'Untitled Video'
+            title: video.title || 'Untitled Video',
+            notes: video.notes || '',  // Default to empty if not available
+            prosText: video.prosText || ''  // Default to empty if not available
           };
         });
         console.log("Videos fetched:", this.videoList);  // Log video list for verification
@@ -51,12 +61,45 @@ export class DashboardComponent implements OnInit {
     }
   }
   
-
   // Handle video selection from the dropdown
   onVideoSelected(): void {
     console.log('Dropdown changed, selected URL:', this.selectedVideoUrl); // Debugging dropdown selection
     const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
-    this.selectedVideoTitle = selectedVideo ? selectedVideo.title : null;
+    if (selectedVideo) {
+      this.selectedVideoTitle = selectedVideo.title;
+      this.notes = selectedVideo.notes;  // Load notes from the selected video
+      this.prosText = selectedVideo.prosText;  // Load "What the Pros Say" from the selected video
+    } else {
+      this.selectedVideoTitle = null;
+      this.notes = '';
+      this.prosText = '';
+    }
     console.log('Selected video URL:', this.selectedVideoUrl, 'Title:', this.selectedVideoTitle); // Verify selection
+  }
+
+  // Save notes to the selected video
+  saveNotes(): void {
+    const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
+    if (selectedVideo) {
+      selectedVideo.notes = this.notes;
+      console.log('Notes saved:', this.notes);
+      // Add Firebase save logic here if needed
+    }
+  }
+
+  // Save "What the Pros Say" to the selected video
+  savePros(): void {
+    const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
+    if (selectedVideo) {
+      selectedVideo.prosText = this.prosText;
+      console.log('"What the Pros Say" saved:', this.prosText);
+      // Add Firebase save logic here if needed
+    }
+  }
+
+  // Generate "What the Pros Say" by resetting the field and saving it
+  generatePros(): void {
+    this.prosText = '';  // Reset "What the Pros Say"
+    this.savePros();  // Save to the selected video metadata
   }
 }

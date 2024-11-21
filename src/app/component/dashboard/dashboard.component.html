@@ -10,24 +10,58 @@
     <div class="container">
         <h1>Your Uploaded Videos</h1>
 
-        <!-- Video Selection Dropdown -->
-        <div class="video-selection">
-            <label for="videoDropdown">Select a Video:</label>
-            <select id="videoDropdown" [(ngModel)]="selectedVideoUrl" (change)="onVideoSelected()">
-                <option value="" disabled selected>Select a video</option>
-                <option *ngFor="let video of videoList" [value]="video.url">{{ video.title }}</option>
+        <!-- Club Type Dropdown -->
+        <div class="club-type-selection">
+            <label for="clubTypeDropdown">Select Club Type:</label>
+            <select id="clubTypeDropdown">
+                <option value="" disabled selected>Select Club Type</option>
+                <option>Driver</option>
+                <option>Iron</option>
+                <option>Wedge</option>
+                <option>Putter</option>
             </select>
         </div>
 
-        <!-- Display Selected Video -->
-        <div *ngIf="selectedVideoUrl" class="video-container">
-            <!-- Sample template code -->
-            <video *ngIf="selectedVideoUrl" [src]="selectedVideoUrl" controls autoplay></video>
+        <div class="dashboard-layout">
+            <!-- Left Column: Video Player -->
+            <div class="left-column">
+                <!-- Video Selection Dropdown -->
+                <div class="video-selection">
+                    <label for="videoDropdown">Select a Video:</label>
+                    <select id="videoDropdown" [(ngModel)]="selectedVideoUrl" (change)="onVideoSelected()">
+                        <option value="" disabled selected>Select a video</option>
+                        <option *ngFor="let video of videoList" [value]="video.url">{{ video.title }}</option>
+                    </select>
+                </div>
 
-            <p class="video-title">{{ selectedVideoTitle }}</p>
+                <!-- Display Selected Video -->
+                <div *ngIf="selectedVideoUrl" class="video-container">
+                    <video *ngIf="selectedVideoUrl" [src]="selectedVideoUrl" controls autoplay></video>
+                    <p class="video-title">{{ selectedVideoTitle }}</p>
+                </div>
+            </div>
+
+            <!-- Right Column: Notes and What the Pros Say -->
+            <div class="right-column">
+                <!-- Notes Section -->
+                <div class="notes-section">
+                    <label for="notesTextarea">Notes:</label>
+                    <textarea id="notesTextarea" [(ngModel)]="notes" rows="5" placeholder="Enter your notes here..."></textarea>
+                    <button (click)="saveNotes()">Save Notes</button>
+                </div>
+
+                <!-- What the Pros Say Section -->
+                <div class="pros-section">
+                    <label for="prosTextarea">What the Pros Say:</label>
+                    <textarea id="prosTextarea" [(ngModel)]="prosText" rows="5" placeholder="Enter what the pros say here..."></textarea>
+                    <div class="pros-buttons">
+                        <button (click)="generatePros()">Generate</button>
+                        <button (click)="savePros()">Save</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
 
     <!-- Sidebar Component -->
     <app-sidebar></app-sidebar>
