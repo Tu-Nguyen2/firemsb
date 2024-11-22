@@ -22,6 +22,11 @@ export class DashboardComponent implements OnInit {
   prosText: string = '';  // Store "What the Pros Say"
   userId: string | null = null;  // Store the current user's ID
 
+
+  prosOptions: string[] = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10'];  
+selectedProsOptions: boolean[] = Array(10).fill(false);  // Boolean array to track selected options
+generatedSolutions: string[] = [];  // Placeholder for generated solutions
+
   constructor(
     private firebaseService: FirebaseService,
     private afAuth: AngularFireAuth,
@@ -87,19 +92,19 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Save "What the Pros Say" to the selected video
-  savePros(): void {
-    const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
-    if (selectedVideo) {
-      selectedVideo.prosText = this.prosText;
-      console.log('"What the Pros Say" saved:', this.prosText);
-      // Add Firebase save logic here if needed
-    }
-  }
+// Generate solutions based on selected options
+generateSolutions(): void {
+  const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
+  console.log('Selected options:', selectedOptions); // Debugging
 
-  // Generate "What the Pros Say" by resetting the field and saving it
-  generatePros(): void {
-    this.prosText = '';  // Reset "What the Pros Say"
-    this.savePros();  // Save to the selected video metadata
-  }
+  // Example logic: Generate up to 5 placeholder solutions
+  this.generatedSolutions = selectedOptions.map((option, index) => `Solution ${index + 1} for ${option}`).slice(0, 5);
+}
+
+// Save "What the Pros Say" data
+savePros(): void {
+  const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
+  this.prosText = `Selected options: ${selectedOptions.join(', ')}`;
+  console.log('"What the Pros Say" saved:', this.prosText);
+}
 }

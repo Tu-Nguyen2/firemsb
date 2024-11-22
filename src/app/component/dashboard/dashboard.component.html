@@ -52,10 +52,30 @@
 
                 <!-- What the Pros Say Section -->
                 <div class="pros-section">
-                    <label for="prosTextarea">What the Pros Say:</label>
-                    <textarea id="prosTextarea" [(ngModel)]="prosText" rows="5" placeholder="Enter what the pros say here..."></textarea>
+                    <label for="prosChart">What the Pros Say (Select Options):</label>
+                    <div id="prosChart">
+                        <div *ngFor="let option of prosOptions; let i = index" class="chart-option">
+                            <input 
+                                type="checkbox" 
+                                [id]="'prosOption' + i" 
+                                [value]="option" 
+                                [(ngModel)]="selectedProsOptions[i]"
+                            />
+                            <label [for]="'prosOption' + i">{{ option }}</label>
+                        </div>
+                    </div>
+
+                    <!-- Generated Solutions -->
+                    <div class="generated-solutions">
+                        <h3>Generated Solutions:</h3>
+                        <ul>
+                            <li *ngFor="let solution of generatedSolutions">{{ solution }}</li>
+                        </ul>
+                    </div>
+
+                    <!-- Buttons -->
                     <div class="pros-buttons">
-                        <button (click)="generatePros()">Generate</button>
+                        <button (click)="generateSolutions()">Generate</button>
                         <button (click)="savePros()">Save</button>
                     </div>
                 </div>
