@@ -1,6 +1,10 @@
 flask
 flask-cors
-numpy
+numpy<2
 opencv-python-headless
 ultralytics
 scipy
+ffmpeg-python
+torch==2.2.1+cu118
+torchvision==0.17.1+cu118
+-f https://download.pytorch.org/whl/torch_stable.html
