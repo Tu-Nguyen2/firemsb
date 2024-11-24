@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FirebaseService } from '../../services/firebase.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-msb',
@@ -17,8 +18,9 @@ export class MsbComponent {
   notes: string = '';
   displayedVideo: { title: string; rawvideourl: string } | null = null;
   userId: string | null = null;
+  flaskBaseUrl: string = 'http://127.0.0.1:5000';
 
-  constructor(private firebaseService: FirebaseService, private afAuth: AngularFireAuth) {
+  constructor(private firebaseService: FirebaseService, private afAuth: AngularFireAuth, private http: HttpClient) {
     this.afAuth.authState.subscribe(user => {
       if (user) {
         this.userId = user.uid;
