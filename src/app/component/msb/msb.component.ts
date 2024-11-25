@@ -32,11 +32,15 @@ export class MsbComponent {
     return sanitizedHandedness === 'right' || sanitizedHandedness === 'left' ? sanitizedHandedness : 'right';
   }
 
+
   // Handles file selection
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
+      console.log("File selected:", this.selectedFile.name);
+    } else {
+        console.log("No file selected.");
     }
   }
 

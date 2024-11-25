@@ -9,6 +9,7 @@ import torch
 import firebase_admin
 from firebase_admin import credentials, storage
 import traceback
+import subprocess
 
 cred = credentials.Certificate("./msbuddy-69e38-firebase-adminsdk-h1gp2-7d089744a7.json")
 firebase_admin.initialize_app(cred, {
@@ -23,31 +24,51 @@ UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+ffmpeg_path = r"C:\ffmpeg\ffmpeg-7.1-full_build\bin\ffmpeg.exe"
+
+
 
 def convert_to_mp4(input_file, output_file=None):
+    """
+    Converts a video file to MP4 using FFmpeg and the libx264 codec.
+    """
     try:
         if output_file is None:
             output_file = input_file.rsplit(".", 1)[0] + ".mp4"
-        cap = cv2.VideoCapture(input_file)
-        if not cap.isOpened():
-            raise FileNotFoundError(f"Cannot open video file: {input_file}")
-        fps = int(cap.get(cv2.CAP_PROP_FPS))
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        out = cv2.VideoWriter(output_file, fourcc, fps, (width, height))
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
-            out.write(frame)
-        cap.release()
-        out.release()
-        return output_file
-    except Exception as e:
-        raise ValueError(f"Error in video conversion: {str(e)}")
 
-def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, model_path, frame_skip=1, handedness="right"):
+        if not os.path.exists(input_file):
+            raise FileNotFoundError(f"Input file not found: {input_file}")
+        print(f"Converting file: {input_file} to {output_file}")
+
+        # Path to FFmpeg (ensure FFmpeg is installed and in PATH)
+        ffmpeg_command = [
+            ffmpeg_path,  
+            "-i", input_file,        # Input file
+            "-c:v", "libx264",       # Use libx264 for video encoding
+            "-preset", "fast",       # Encoding speed/quality tradeoff
+            "-crf", "23",            # Constant Rate Factor (lower is better quality)
+            "-c:a", "aac",           # Use AAC for audio encoding
+            "-b:a", "128k",          # Set audio bitrate
+            "-movflags", "faststart",# Optimize for streaming
+            output_file              # Output file
+        ]
+
+        print("Running FFmpeg command:", " ".join(ffmpeg_command))
+        result = subprocess.run(ffmpeg_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        # Check for success
+        if result.returncode != 0:
+            print(f"FFmpeg STDERR: {result.stderr}")
+            raise Exception(f"FFmpeg failed with error: {result.stderr}")
+
+        print(f"Conversion complete: {output_file}")
+        return output_file
+
+    except Exception as e:
+        print(f"Error in convert_to_mp4: {e}")
+        raise
+
+def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, model_path, frame_skip=1, handedness="right", batch_size=8):
     try:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model = YOLO(model_path).to(device)
@@ -68,7 +89,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
         os.makedirs(output_directory, exist_ok=True)
 
         # Define the video writer
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*'avc1')  # Use H.264 codec
         out = cv2.VideoWriter(output_video, fourcc, input_fps, (width, height))
         if not out.isOpened():
             cap.release()
@@ -83,16 +104,64 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
 
         driver_count, iron_count = 0, 0
 
+        # Prepare for batch processing
+        frame_batch = []
+        frame_indices = []
+
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
 
             if frame_id % frame_skip == 0:
-                results = model(frame)
+                frame_batch.append(frame)
+                frame_indices.append(frame_id)
+
+            # Process batch when it reaches the batch size
+            if len(frame_batch) == batch_size:
+                results = model(frame_batch)  # Perform batch inference
+                for idx, result in enumerate(results):
+                    club_head_detected = False
+
+                    for box in result.boxes:
+                        class_id = int(box.cls[0])
+                        if class_id == 0:  # Club head class
+                            x_center, y_center = int(box.xywh[0][0]), int(box.xywh[0][1])
+                            if (handedness.lower() == "left" and x_center >= suspicious_x_threshold and y_center >= suspicious_y_threshold) or \
+                               (handedness.lower() == "right" and x_center <= suspicious_x_threshold and y_center >= suspicious_y_threshold):
+                                print(f"Skipping suspicious detection at ({x_center}, {y_center})")
+                            else:
+                                club_head_detected = True
+                                accumulated_positions.append((x_center, y_center))
+                            break
+                        elif class_id == 1:  # Driver class
+                            driver_count += 1
+                        elif class_id == 2:  # Iron class
+                            iron_count += 1
+
+                    if not club_head_detected:
+                        print(f"Club head not detected in frame {frame_indices[idx]}")
+
+                    # Draw trajectory on the frame
+                    for i in range(1, len(accumulated_positions)):
+                        cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (0, 255, 0), 2)
+                    if accumulated_positions:
+                        cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
+
+                    out.write(frame_batch[idx])  # Write the processed frame to output video
+
+                frame_batch.clear()
+                frame_indices.clear()
+
+            frame_id += 1
+
+        # Process any remaining frames in the batch
+        if frame_batch:
+            results = model(frame_batch)
+            for idx, result in enumerate(results):
                 club_head_detected = False
 
-                for box in results[0].boxes:
+                for box in result.boxes:
                     class_id = int(box.cls[0])
                     if class_id == 0:  # Club head class
                         x_center, y_center = int(box.xywh[0][0]), int(box.xywh[0][1])
@@ -109,16 +178,15 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
                         iron_count += 1
 
                 if not club_head_detected:
-                    print(f"Club head not detected in frame {frame_id}")
+                    print(f"Club head not detected in frame {frame_indices[idx]}")
 
-            # Draw trajectory
-            for i in range(1, len(accumulated_positions)):
-                cv2.line(frame, accumulated_positions[i - 1], accumulated_positions[i], (0, 255, 0), 2)
-            if accumulated_positions:
-                cv2.circle(frame, accumulated_positions[-1], 5, (0, 0, 255), -1)
+                # Draw trajectory on the frame
+                for i in range(1, len(accumulated_positions)):
+                    cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (0, 255, 0), 2)
+                if accumulated_positions:
+                    cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
 
-            out.write(frame)
-            frame_id += 1
+                out.write(frame_batch[idx])  # Write the processed frame to output video
 
         cap.release()
         out.release()
@@ -133,6 +201,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
     except Exception as e:
         print(f"Error in synthesize_key_frames_with_smooth_trajectory: {str(e)}")
         raise
+
 
 
 
