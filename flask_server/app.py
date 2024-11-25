@@ -182,7 +182,7 @@ def process_video():
         clubtype = synthesize_key_frames_with_smooth_trajectory(
             input_file, processed_file_path, model_path, frame_skip=1, handedness=handedness
         )
-
+ 
         bucket = storage.bucket()
         blob_path = f'processed_videos/{user_id}/{processed_file_name}'
         blob = bucket.blob(blob_path)
