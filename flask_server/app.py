@@ -3,10 +3,12 @@ from flask_cors import CORS
 import os
 import cv2
 import ffmpeg
+import uuid
 from ultralytics import YOLO
 import torch
 import firebase_admin
 from firebase_admin import credentials, storage
+import traceback
 
 cred = credentials.Certificate("./msbuddy-69e38-firebase-adminsdk-h1gp2-7d089744a7.json")
 firebase_admin.initialize_app(cred, {
@@ -173,31 +175,44 @@ def process_video():
         if not input_file or not os.path.exists(input_file):
             return jsonify({"error": "File not found"}), 400
 
-        user_folder = os.path.join(UPLOAD_FOLDER, "processed_videos", user_id)
-        os.makedirs(user_folder, exist_ok=True)
+        # Generate processed file path
         processed_file_name = os.path.basename(input_file).rsplit(".", 1)[0] + "_processed.mp4"
-        processed_file_path = os.path.join(user_folder, processed_file_name)
+        processed_file_path = os.path.join(UPLOAD_FOLDER, "processed_videos", user_id, processed_file_name)
+        os.makedirs(os.path.dirname(processed_file_path), exist_ok=True)
 
+        # process the video video
         model_path = "./yolo/models/myswingbuddyV2_best/weights/best.pt"
         clubtype = synthesize_key_frames_with_smooth_trajectory(
             input_file, processed_file_path, model_path, frame_skip=1, handedness=handedness
         )
- 
+        
+        token = str(uuid.uuid4())
+        metadata = {
+            "firebaseStorageDownloadTokens": token
+        }
+
+        # Upload to Firebase Storage
         bucket = storage.bucket()
         blob_path = f'processed_videos/{user_id}/{processed_file_name}'
         blob = bucket.blob(blob_path)
-        blob.upload_from_filename(processed_file_path)
-        blob.make_public()
-        firebase_url = blob.public_url
+
+        blob.upload_from_filename(processed_file_path, content_type='video/mp4')
+        blob.metadata = metadata
+        blob.patch()  
+
+        firebase_url = f"https://firebasestorage.googleapis.com/v0/b/{bucket.name}/o/{blob_path.replace('/', '%2F')}?alt=media&token={token}"
 
         return jsonify({
             "message": "Processed successfully",
             "clubtype": clubtype,
-            "videoprocessedurl": firebase_url,
-            "wtps": "Placeholder for calculated WTPS"
+            "videoprocessedurl": firebase_url
         }), 200
+
     except Exception as e:
+        print(f"Error in /process: {str(e)}")
+        traceback.print_exc()  
         return jsonify({"error": f"Processing failed: {str(e)}"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
