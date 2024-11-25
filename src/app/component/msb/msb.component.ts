@@ -43,50 +43,66 @@ export class MsbComponent {
   // Upload video and set it as the currently displayed video
   uploadVideo(): void {
     if (this.selectedFile && this.videoTitle.trim() && this.userId) {
-      // Step 1: Fetch handedness from the user's profile
       this.firebaseService.getProfile(this.userId).subscribe({
         next: (profile) => {
           const handedness = this.validateHandedness(profile?.handedness);
 
-          // Step 2: Upload video to Firebase Storage
-          this.firebaseService.uploadVideo(this.userId!, this.selectedFile!, false).subscribe({
+          this.firebaseService.uploadVideo(this.userId!, this.selectedFile!).subscribe({
             next: (rawVideoUrl) => {
               console.log("Raw video uploaded to Firebase Storage:", rawVideoUrl);
 
-              // Step 3: Prepare metadata for Firestore
-              const videoData = {
-                title: this.videoTitle.trim(),
-                handedness: handedness, // from the profile
-                clubtype: '',  //response from flask
-                notes: '',  //populated in dash
-                rawvideourl: rawVideoUrl,
-                videoprocessedurl: '', // response from flask
-                wtps: '', // will be populated in dash
-              };
+              this.displayedVideo = { title: this.videoTitle.trim(), rawvideourl: rawVideoUrl };
 
-              // Step 4: Save metadata to Firestore
-              const videoId = this.firebaseService.generateId();
-              this.firebaseService.saveVideoMetadata(this.userId!, videoId, videoData).then(() => {
-                console.log("Video metadata saved to Firestore");
+              const formData = new FormData();
+              formData.append("file", this.selectedFile!);
 
-                // Step 5: Optionally update the user's handedness profile if necessary
-                this.firebaseService.updateProfile(this.userId!, { handedness }).then(() => {
-                  console.log('Handedness updated in profile (if needed)');
-                }).catch((error) => {
-                  console.error('Error updating handedness in profile:', error);
-                });
+              this.http.post(`${this.flaskBaseUrl}/upload`, formData).subscribe({
+                next: (response: any) => {
+                  const convertedFilePath = response.file_path;
 
-                // Display the uploaded video
-                this.displayedVideo = { title: this.videoTitle.trim(), rawvideourl: rawVideoUrl };
+                  const processPayload = {
+                    file_path: convertedFilePath,
+                    handedness: handedness,
+                    user_id: this.userId
+                  };
 
-                // Reset form fields after upload
-                this.resetForm();
-              }).catch((error) => {
-                console.error("Error saving video metadata to Firestore:", error);
+                  console.log("Payload sent to Flask process API:", processPayload);
+
+                  this.http.post(`${this.flaskBaseUrl}/process`, processPayload).subscribe({
+                    next: (response: any) => {
+                      const processedVideoUrl = response.videoprocessedurl;
+                      console.log("Processed video URL:", processedVideoUrl);
+
+                      const videoData = {
+                        title: this.videoTitle.trim(),
+                        handedness: handedness,
+                        clubtype: response.clubtype,
+                        notes: '',
+                        rawvideourl: rawVideoUrl,
+                        videoprocessedurl: processedVideoUrl,
+                        wtps: '' // Assuming Flask returns this data
+                      };
+
+                      const videoId = this.firebaseService.generateId();
+                      this.firebaseService.saveVideoMetadata(this.userId!, videoId, videoData).then(() => {
+                        console.log("Video metadata saved to Firestore.");
+                        this.resetForm();
+                      }).catch((error) => {
+                        console.error("Error saving video metadata:", error);
+                      });
+                    },
+                    error: (err) => {
+                      console.error("Error processing video:", err);
+                    }
+                  });
+                },
+                error: (error) => {
+                  console.error("Error uploading video to Flask:", error);
+                }
               });
             },
             error: (error) => {
-              console.error("Error uploading video:", error);
+              console.error("Error uploading raw video:", error);
             }
           });
         },
@@ -98,6 +114,7 @@ export class MsbComponent {
       alert("Please complete all fields and select a video.");
     }
   }
+  
 
   private resetForm(): void {
     this.selectedFile = null;

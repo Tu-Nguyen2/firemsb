@@ -20,6 +20,7 @@ import { DashboardComponent } from './component/dashboard/dashboard.component';
 import { ProfileComponent } from './component/profile/profile.component';
 import { AuthGuard } from './auth.guard';
 import { HomeComponent } from './component/home/home.component'; // Import your Auth Guard
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },   // Login page does not need AuthGuard
@@ -50,6 +51,7 @@ const routes: Routes = [
     RouterModule.forRoot(routes),
     AngularFireModule.initializeApp(environment.firebase),
     FormsModule,
+    HttpClientModule,
     
     AngularFireModule.initializeApp({
       apiKey: "AIzaSyAzfK9Tj06Xzya3RhGJec4pf7Nf24hqreo",

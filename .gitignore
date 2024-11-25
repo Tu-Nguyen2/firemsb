@@ -44,3 +44,5 @@ Thumbs.db
 src/environment/
 
 flask_server/uploads
+
+uploads

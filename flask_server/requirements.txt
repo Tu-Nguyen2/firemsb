@@ -1,5 +1,6 @@
 flask
 flask-cors
+firebase-admin
 numpy<2
 opencv-python-headless
 ultralytics

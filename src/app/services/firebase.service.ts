@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { AngularFireAuth } from '@angular/fire/compat/auth'; // Import AngularFireAuth
-import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { finalize, last, switchMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class FirebaseService {
   constructor(
     private firestore: AngularFirestore,
     private storage: AngularFireStorage,
-    private afAuth: AngularFireAuth 
+    private afAuth: AngularFireAuth,
+    private http: HttpClient
   ) {}
 
   generateId(): string {
@@ -21,22 +23,45 @@ export class FirebaseService {
   }
 
   // Uploads a video file to Firebase Storage
-  uploadVideo(userId: string, file: File, processed: boolean): Observable<string> {
-    const filePath = `users/${userId}/videos/${processed ? 'processed_' : ''}${file.name}`;
+  uploadVideo(userId: string, file: File): Observable<string> {
+    const filePath = `raw_videos/${userId}/${file.name}`; // Correct raw video path
     const fileRef = this.storage.ref(filePath);
-    const task = this.storage.upload(filePath, file);
-
+    const uploadTask = fileRef.put(file);
+  
     return new Observable((observer) => {
-      task.snapshotChanges().pipe(
+      uploadTask.snapshotChanges().pipe(
         finalize(() => {
-          fileRef.getDownloadURL().subscribe(url => {
-            observer.next(url);
-            observer.complete();
+          fileRef.getDownloadURL().subscribe({
+            next: (downloadUrl: string) => {
+              observer.next(downloadUrl); // Return the Firebase Storage URL
+              observer.complete();
+            },
+            error: (err) => observer.error(err),
           });
         })
-      ).subscribe();
+      ).subscribe({
+        error: (err) => observer.error(err),
+      });
     });
   }
+  
+  uploadProcessedVideo(userId: string, processedFile: File): Observable<string> {
+    const filePath = `processed_videos/${userId}/${processedFile.name}`;
+    const fileRef = this.storage.ref(filePath);
+    const uploadTask = this.storage.upload(filePath, processedFile);
+  
+    return uploadTask.snapshotChanges().pipe(
+      finalize(() => fileRef.getDownloadURL()),
+      switchMap(() => fileRef.getDownloadURL())
+    );
+  }
+  
+  getBlobFromFilePath(filePath: string): Observable<Blob> {
+    return this.http.get(filePath, { responseType: 'blob' });
+  }
+  
+  
+  
 
   saveVideoMetadata(userId: string, videoId: string, videoData: any): Promise<void> {
     return this.firestore.collection(`users/${userId}/videos`).doc(videoId).set(videoData);
