@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FirebaseService } from '../../services/firebase.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ChangeDetectorRef } from '@angular/core';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,13 +21,13 @@ export class DashboardComponent implements OnInit {
   selectedVideoUrl: string | null = null;  // Store URL of selected video
   selectedVideoTitle: string | null = null;  // Store title of selected video
   notes: string = '';  // Store current notes
-  prosText: string = '';  // Store "What the Pros Say"
+  wtps: string = '';  // Store "What the Pros Say"
   userId: string | null = null;  // Store the current user's ID
 
 
   prosOptions: string[] = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10'];  
-selectedProsOptions: boolean[] = Array(10).fill(false);  // Boolean array to track selected options
-generatedSolutions: string[] = [];  // Placeholder for generated solutions
+  selectedProsOptions: boolean[] = Array(10).fill(false);  // Boolean array to track selected options
+  generatedSolutions: string[] = [];  // Placeholder for generated solutions
 
   constructor(
     private firebaseService: FirebaseService,
@@ -73,24 +75,47 @@ generatedSolutions: string[] = [];  // Placeholder for generated solutions
     if (selectedVideo) {
       this.selectedVideoTitle = selectedVideo.title;
       this.notes = selectedVideo.notes;  // Load notes from the selected video
-      this.prosText = selectedVideo.prosText;  // Load "What the Pros Say" from the selected video
+      this.wtps = selectedVideo.prosText;  // Load "What the Pros Say" from the selected video
     } else {
       this.selectedVideoTitle = null;
       this.notes = '';
-      this.prosText = '';
+      this.wtps = '';
     }
     console.log('Selected video URL:', this.selectedVideoUrl, 'Title:', this.selectedVideoTitle); // Verify selection
   }
 
-  // Save notes to the selected video
+  
   saveNotes(): void {
-    const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
-    if (selectedVideo) {
-      selectedVideo.notes = this.notes;
-      console.log('Notes saved:', this.notes);
-      // Add Firebase save logic here if needed
+    if (this.selectedVideoUrl && this.notes !== '') {
+      const videoToUpdate = this.videoList.find(video => video.url === this.selectedVideoUrl);
+  
+      if (videoToUpdate) {
+        videoToUpdate.notes = this.notes;  // Update the local video object
+  
+        // Pass the userId, selected video URL, and notes to the Firebase service method
+        if (this.userId) {
+          this.firebaseService.updateVideoNotesByUrl(this.userId, this.selectedVideoUrl, this.notes).subscribe({
+            next: () => {
+              console.log('Notes updated successfully!');
+            },
+            error: (err) => {
+              console.error('Error updating notes:', err);
+            }
+          });
+        } else {
+          console.log('User ID is not available');
+        }
+      } else {
+        console.log('Selected video not found!');
+      }
+    } else {
+      console.log('No video selected or notes are empty!');
     }
   }
+  
+  
+  
+  //save notes will update this.notes
 
 // Generate solutions based on selected options
 generateSolutions(): void {
@@ -101,10 +126,11 @@ generateSolutions(): void {
   this.generatedSolutions = selectedOptions.map((option, index) => `Solution ${index + 1} for ${option}`).slice(0, 5);
 }
 
-// Save "What the Pros Say" data
+// Save "What the Pros Say" data  
 savePros(): void {
   const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
-  this.prosText = `Selected options: ${selectedOptions.join(', ')}`;
-  console.log('"What the Pros Say" saved:', this.prosText);
+  this.wtps = `Selected options: ${selectedOptions.join(', ')}`;
+  console.log('"What the Pros Say" saved:', this.wtps);
 }
 }
+//generate will reset the field
