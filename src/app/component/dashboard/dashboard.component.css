@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     text-align: center;
@@ -15,29 +15,70 @@ body {
 
 h1 {
     color: #333;
+    margin-bottom: 20px;
 }
 
-/* Dropdown and Video Display */
-.video-selection {
-    margin: 20px 0;
-}
-
-.video-selection label {
-    font-size: 16px;
-    margin-right: 10px;
-}
-
-#videoDropdown {
-    padding: 8px;
-    font-size: 16px;
-}
-
-.video-display {
+/* Main Layout */
+.dashboard-layout {
+    display: flex;
     margin-top: 20px;
+}
+
+/* Sidebar */
+app-sidebar {
+    flex: none;
+    width: 175px;
+    margin-right: 20px;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Pros and Video-Notes Container */
+.pros-video-notes-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+}
+
+/* What the Pros Say Section */
+.pros-section {
+    flex: 1.2;
+    max-width: 25%;
+    text-align: left;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Video and Notes Layout */
+.video-notes-container {
+    display: flex;
+    flex: 4;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* Video Player Section */
+.video-container {
+    flex: 3;
+    width: 60%;
+    text-align: left;
     background-color: white;
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 video {
@@ -49,4 +90,61 @@ video {
     font-size: 18px;
     color: #333;
     margin-top: 10px;
+}
+
+/* Notes and Club Type Container */
+.notes-container {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Club Type Box */
+.club-type-box {
+    text-align: left;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Notes Section */
+.notes-section {
+    text-align: left;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
+}
+
+.notes-section textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: none;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.notes-save-button {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.notes-save-button button {
+    padding: 8px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.notes-save-button button:hover {
+    background-color: #0056b3;
 }
