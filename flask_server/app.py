@@ -244,12 +244,12 @@ def process_video():
         if not input_file or not os.path.exists(input_file):
             return jsonify({"error": "File not found"}), 400
 
-        # Generate processed file path
+        
         processed_file_name = os.path.basename(input_file).rsplit(".", 1)[0] + "_processed.mp4"
         processed_file_path = os.path.join(UPLOAD_FOLDER, "processed_videos", user_id, processed_file_name)
         os.makedirs(os.path.dirname(processed_file_path), exist_ok=True)
 
-        # process the video video
+        
         model_path = "./yolo/models/myswingbuddyV2_best/weights/best.pt"
         clubtype = synthesize_key_frames_with_smooth_trajectory(
             input_file, processed_file_path, model_path, frame_skip=1, handedness=handedness

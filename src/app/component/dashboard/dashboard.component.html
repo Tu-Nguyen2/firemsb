@@ -13,13 +13,12 @@
         <!-- Club Type Dropdown -->
         <div class="club-type-selection">
             <label for="clubTypeDropdown">Select Club Type:</label>
-            <select id="clubTypeDropdown">
-                <option value="" disabled selected>Select Club Type</option>
+            <select id="clubTypeDropdown" [(ngModel)]="selectedClubType" (change)="onClubTypeChange()">
+                <option value="" disabled>Select Club Type</option>
                 <option>Driver</option>
                 <option>Iron</option>
                 <option>Wedge</option>
-                <option>Putter</option>
-            </select>
+              </select>
         </div>
 
         <div class="dashboard-layout">
