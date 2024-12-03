@@ -10,6 +10,7 @@ import firebase_admin
 from firebase_admin import credentials, storage
 import traceback
 import subprocess
+import mediapipe as mp
 
 cred = credentials.Certificate("./msbuddy-69e38-firebase-adminsdk-h1gp2-7d089744a7.json")
 firebase_admin.initialize_app(cred, {
@@ -68,6 +69,7 @@ def convert_to_mp4(input_file, output_file=None):
         print(f"Error in convert_to_mp4: {e}")
         raise
 
+
 def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, model_path, frame_skip=1, handedness="right", batch_size=8):
     try:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -89,7 +91,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
         os.makedirs(output_directory, exist_ok=True)
 
         # Define the video writer
-        fourcc = cv2.VideoWriter.fourcc(*'avc1')  # Use H.264 codec
+        fourcc = cv2.VideoWriter_fourcc(*'avc1')  # Use H.264 codec
         out = cv2.VideoWriter(output_video, fourcc, input_fps, (width, height))
         if not out.isOpened():
             cap.release()
@@ -104,9 +106,28 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
 
         driver_count, iron_count = 0, 0
 
-        # Prepare for batch processing
+        #used for batching
         frame_batch = []
         frame_indices = []
+
+        # Mediapipe setup, list of connections we need
+        mp_pose = mp.solutions.pose
+        pose = mp_pose.Pose(static_image_mode=False, model_complexity=1)
+
+        BODY_CONNECTIONS = [
+            (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.RIGHT_SHOULDER),
+            (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.LEFT_ELBOW),
+            (mp_pose.PoseLandmark.LEFT_ELBOW, mp_pose.PoseLandmark.LEFT_WRIST),
+            (mp_pose.PoseLandmark.RIGHT_SHOULDER, mp_pose.PoseLandmark.RIGHT_ELBOW),
+            (mp_pose.PoseLandmark.RIGHT_ELBOW, mp_pose.PoseLandmark.RIGHT_WRIST),
+            (mp_pose.PoseLandmark.LEFT_SHOULDER, mp_pose.PoseLandmark.LEFT_HIP),
+            (mp_pose.PoseLandmark.RIGHT_SHOULDER, mp_pose.PoseLandmark.RIGHT_HIP),
+            (mp_pose.PoseLandmark.LEFT_HIP, mp_pose.PoseLandmark.RIGHT_HIP),
+            (mp_pose.PoseLandmark.LEFT_HIP, mp_pose.PoseLandmark.LEFT_KNEE),
+            (mp_pose.PoseLandmark.LEFT_KNEE, mp_pose.PoseLandmark.LEFT_ANKLE),
+            (mp_pose.PoseLandmark.RIGHT_HIP, mp_pose.PoseLandmark.RIGHT_KNEE),
+            (mp_pose.PoseLandmark.RIGHT_KNEE, mp_pose.PoseLandmark.RIGHT_ANKLE),
+        ]
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -117,9 +138,9 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
                 frame_batch.append(frame)
                 frame_indices.append(frame_id)
 
-            # Process batch when it reaches the batch size
+            # Process batch when its full
             if len(frame_batch) == batch_size:
-                results = model(frame_batch)  # Perform batch inference
+                results = model(frame_batch)  # Perform inference on batch
                 for idx, result in enumerate(results):
                     club_head_detected = False
 
@@ -148,48 +169,28 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
                     if accumulated_positions:
                         cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
 
-                    out.write(frame_batch[idx])  # Write the processed frame to output video
+                    # draw the mediapipe wireframe
+                    frame_rgb = cv2.cvtColor(frame_batch[idx], cv2.COLOR_BGR2RGB)
+                    pose_results = pose.process(frame_rgb)
+
+                    if pose_results.pose_landmarks:
+                        landmarks = pose_results.pose_landmarks.landmark
+                        for start, end in BODY_CONNECTIONS:
+                            if landmarks[start].visibility > 0.5 and landmarks[end].visibility > 0.5:
+                                start_point = (int(landmarks[start].x * width), int(landmarks[start].y * height))
+                                end_point = (int(landmarks[end].x * width), int(landmarks[end].y * height))
+                                cv2.line(frame_batch[idx], start_point, end_point, (0, 50, 255), 2)
+
+                    out.write(frame_batch[idx])  # Write the processed frame with pose and traj to output video
 
                 frame_batch.clear()
                 frame_indices.clear()
 
             frame_id += 1
 
-        # Process any remaining frames in the batch
-        if frame_batch:
-            results = model(frame_batch)
-            for idx, result in enumerate(results):
-                club_head_detected = False
-
-                for box in result.boxes:
-                    class_id = int(box.cls[0])
-                    if class_id == 0:  # Club head class
-                        x_center, y_center = int(box.xywh[0][0]), int(box.xywh[0][1])
-                        if (handedness.lower() == "left" and x_center >= suspicious_x_threshold and y_center >= suspicious_y_threshold) or \
-                           (handedness.lower() == "right" and x_center <= suspicious_x_threshold and y_center >= suspicious_y_threshold):
-                            print(f"Skipping suspicious detection at ({x_center}, {y_center})")
-                        else:
-                            club_head_detected = True
-                            accumulated_positions.append((x_center, y_center))
-                        break
-                    elif class_id == 1:  # Driver class
-                        driver_count += 1
-                    elif class_id == 2:  # Iron class
-                        iron_count += 1
-
-                if not club_head_detected:
-                    print(f"Club head not detected in frame {frame_indices[idx]}")
-
-                # Draw trajectory on the frame
-                for i in range(1, len(accumulated_positions)):
-                    cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (50, 30, 250), 2)
-                if accumulated_positions:
-                    cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
-
-                out.write(frame_batch[idx])  # Write the processed frame to output video
-
         cap.release()
         out.release()
+        pose.close()
 
         # Determine club type
         if driver_count > iron_count:
@@ -201,7 +202,6 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
     except Exception as e:
         print(f"Error in synthesize_key_frames_with_smooth_trajectory: {str(e)}")
         raise
-
 
 
 

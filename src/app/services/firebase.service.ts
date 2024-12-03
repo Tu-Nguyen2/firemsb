@@ -147,7 +147,7 @@ export class FirebaseService {
     return this.firestore.collection('videos', ref => ref.where('userId', '==', userId)).valueChanges();
   }
 
-  updateVideoClubType(userId: string, videoUrl: string, clubType: string): Observable<void> {
+  updateVideoClubType(userId: string, videoUrl: string, clubtype: string): Observable<void> {
     // Query Firestore for the video document based on userId and videoUrl
     return this.firestore
       .collection('users')
@@ -161,7 +161,7 @@ export class FirebaseService {
           } else {
             // Update the clubType field for the first matching document
             const videoDoc = querySnapshot.docs[0];
-            return from(videoDoc.ref.update({ clubType }));
+            return from(videoDoc.ref.update({ clubtype }));
           }
         })
       );
