@@ -89,7 +89,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
         os.makedirs(output_directory, exist_ok=True)
 
         # Define the video writer
-        fourcc = cv2.VideoWriter_fourcc(*'avc1')  # Use H.264 codec
+        fourcc = cv2.VideoWriter.fourcc(*'avc1')  # Use H.264 codec
         out = cv2.VideoWriter(output_video, fourcc, input_fps, (width, height))
         if not out.isOpened():
             cap.release()
@@ -144,7 +144,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
 
                     # Draw trajectory on the frame
                     for i in range(1, len(accumulated_positions)):
-                        cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (0, 255, 0), 2)
+                        cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (50, 30, 250), 2)
                     if accumulated_positions:
                         cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
 
@@ -182,7 +182,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
 
                 # Draw trajectory on the frame
                 for i in range(1, len(accumulated_positions)):
-                    cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (0, 255, 0), 2)
+                    cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (50, 30, 250), 2)
                 if accumulated_positions:
                     cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
 
@@ -260,9 +260,9 @@ def process_video():
             "firebaseStorageDownloadTokens": token
         }
 
-        # Upload to Firebase Storage
+        # Upload to Firebase Storage 
         bucket = storage.bucket()
-        blob_path = f'processed_videos/{user_id}/{processed_file_name}'
+        blob_path = f'users/{user_id}/processed_videos/{processed_file_name}'
         blob = bucket.blob(blob_path)
 
         blob.upload_from_filename(processed_file_path, content_type='video/mp4')

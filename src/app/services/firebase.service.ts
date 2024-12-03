@@ -72,7 +72,7 @@ export class FirebaseService {
 
   // Uploads a video file to Firebase Storage
   uploadVideo(userId: string, file: File): Observable<string> {
-    const filePath = `raw_videos/${userId}/${file.name}`; // Correct raw video path
+    const filePath = `users/${userId}/raw_videos/${file.name}`;
     const fileRef = this.storage.ref(filePath);
     const uploadTask = fileRef.put(file);
   
@@ -94,7 +94,7 @@ export class FirebaseService {
   }
   
   uploadProcessedVideo(userId: string, processedFile: File): Observable<string> {
-    const filePath = `processed_videos/${userId}/${processedFile.name}`;
+    const filePath = `users/${userId}/processed_videos/${processedFile.name}`;
     const fileRef = this.storage.ref(filePath);
     const uploadTask = this.storage.upload(filePath, processedFile);
   
