@@ -60,7 +60,7 @@ export class DashboardComponent implements OnInit {
             title: video.title || 'Untitled Video',
             notes: video.notes || '',  // Default to empty if not available
             prosText: video.prosText || '',  // Default to empty if not available
-            clubType: video.clubType || 'Uncertain'
+            clubType: video.clubtype || 'Uncertain'
           };
         });
         console.log("Videos fetched:", this.videoList);  // Log video list for verification
