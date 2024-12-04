@@ -19,6 +19,7 @@ export class MsbComponent {
   displayedVideo: { title: string; rawvideourl: string } | null = null;
   userId: string | null = null;
   flaskBaseUrl: string = 'http://127.0.0.1:5000';
+  showTipsPopup: boolean = false;
 
   constructor(private firebaseService: FirebaseService, private afAuth: AngularFireAuth, private http: HttpClient) {
     this.afAuth.authState.subscribe(user => {
@@ -30,6 +31,15 @@ export class MsbComponent {
   private validateHandedness(handedness: string | undefined): string {
     const sanitizedHandedness = handedness?.trim().toLowerCase() || 'right';
     return sanitizedHandedness === 'right' || sanitizedHandedness === 'left' ? sanitizedHandedness : 'right';
+  }
+
+
+  openTipsPopup(): void {
+    this.showTipsPopup = true;
+  }
+
+  closeTipsPopup(): void {
+    this.showTipsPopup = false;
   }
 
 

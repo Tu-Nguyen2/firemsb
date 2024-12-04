@@ -13,12 +13,14 @@
         <!-- Video Upload Form -->
         <form (submit)="uploadVideo(); $event.preventDefault()">
             <!-- File input for video upload with #fileInput reference -->
-            <input type="file" #fileInput (change)="onFileSelected($event)" accept="video/*" name="videoFile">
+            <div class="file-upload-container">
+                <input type="file" #fileInput (change)="onFileSelected($event)" accept="video/*" name="videoFile">
 
+                <a href="#" (click)="openTipsPopup(); $event.preventDefault()">Upload Tips</a>
+            </div>
             <!-- Text inputs for video metadata -->
             <input type="text" [(ngModel)]="videoTitle" placeholder="Enter Video Title" name="videoTitle">
             
-
             <!-- Upload button to trigger uploadVideo method -->
             <button type="button" (click)="uploadVideo()">Upload Video</button>
         </form>
@@ -32,5 +34,13 @@
 
     <!-- Sidebar Component -->
     <app-sidebar></app-sidebar>
+
+    <div class="popup-window" *ngIf="showTipsPopup">
+        <div class="popup-contents">
+            <span class="close-button" (click)="closeTipsPopup()">&times;</span>
+            <h2><b>Tips for a Good Upload</b></h2>
+            <p>Do this and do that</p>
+        </div>
+    </div>
 </body>
 </html>
