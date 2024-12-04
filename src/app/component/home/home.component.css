@@ -26,11 +26,12 @@
   header {
     background: #101820;
     color: #fff;
-    padding: 1.5rem 2rem;
+    padding: 1.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 100vw;
   }
   
   header h1 {
@@ -70,6 +71,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 100vw;
   }
   
   
@@ -110,6 +112,7 @@
     padding: 4rem 2rem;
     text-align: center;
     background: #f8f9fa;
+    min-width: 100vw;
   }
   
   .features h3 {
@@ -145,6 +148,7 @@
   
   /* Testimonials Section */
   .testimonials {
+    min-width: 100vw;
     padding: 4rem 2rem;
     text-align: center;
     background: #e8f5f2;
@@ -186,5 +190,6 @@
     background: #101820;
     color: #fff;
     font-size: 0.9rem;
+    min-width: 100vw;
   }
   
