@@ -30,8 +30,10 @@ export class DashboardComponent implements OnInit {
     'Laid-Off', 'Across the Line', 'Off-Balance Swing', 'Short Swing', 'Over Swing',
     'Outside Takeaway', 'Inside Takeaway', 'Over the Top', 'Casting', 'All Arms Swing',
     'Swaying', 'Reverse Pivot', 'Blocking Shots', 'Scooping the Ball',
-    'Locking Your Right/left Knee', 'Locking Your Right/Left Knee at Impact',
-    'Standing Up at Impact', 'Decel', 'Failing to Maintain your Spine Angle', 'Yips'
+    'Locking Your Right/Left Knee',
+    'Locking Your Right/Left Knee at Impact', 
+    'Standing Up at Impact', 'Decel', 'Failing to Maintain Your Spine Angle',
+    'Yips'
   ];
   selectedProsOptions: boolean[] = new Array(this.prosOptions.length).fill(false);
   generatedSolutions: { text: string }[] = [];
@@ -154,17 +156,21 @@ export class DashboardComponent implements OnInit {
       { text: 'Standing Up at Impact: When you stand up during impact, you lose your posture' },
       { text: 'Decel: Deceleration occurs when you slow down too much during the downswing' },
       { text: 'Failing to Maintain Your Spine Angle: If you fail to maintain your spine angle during the swing' },
-      { text: 'Yips: The yips are often caused by mental stress or tension' }
+      { text: 'Yips: The yips are often caused by mental stress or tension' },
     ];
   
     const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
+  
     this.generatedSolutions = selectedOptions.map(option => {
       const solution = solutions.find(sol => sol.text.includes(option));
+      if (!solution) {
+        console.warn(`No solution found for: ${option}`);
+      }
       return solution ? { text: solution.text } : { text: '' };
     });
   
     this.wtps = this.generatedSolutions.map(solution => solution.text).join('\n');
-
+  
     const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
     if (selectedVideo && this.selectedVideoUrl) {
       if (this.userId) {
@@ -180,6 +186,7 @@ export class DashboardComponent implements OnInit {
       }
     }
   }
+  
 
   savePros(): void {
     const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
