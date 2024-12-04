@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit {
             url: video.videoprocessedurl || video.rawvideourl || '',
             title: video.title || 'Untitled Video',
             notes: video.notes || '',
-            prosText: video.prosText || '',
+            prosText: video.prosText || video.wtps ||'',
             clubType: video.clubtype || 'Uncertain'
           };
         });
@@ -74,12 +74,16 @@ export class DashboardComponent implements OnInit {
     const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
   
     if (selectedVideo) {
-      this.wtps = '';
-      this.generatedSolutions = [];
+      this.wtps = selectedVideo.prosText || '';
       this.selectedProsOptions = new Array(this.prosOptions.length).fill(false);
       this.selectedVideoTitle = selectedVideo.title;
       this.notes = selectedVideo.notes;
       this.selectedClubType = selectedVideo.clubType || '';
+      if (this.wtps) {
+        this.generatedSolutions = this.wtps.split('\n').map(text => ({ text }));
+      } else {
+        this.generatedSolutions = [];
+      }
   
       const clubTypeDropdown = document.getElementById('clubTypeDropdown') as HTMLSelectElement;
       if (clubTypeDropdown) {
