@@ -41,7 +41,7 @@ def convert_to_mp4(input_file, output_file=None):
             raise FileNotFoundError(f"Input file not found: {input_file}")
         print(f"Converting file: {input_file} to {output_file}")
 
-        # Path to FFmpeg (ensure FFmpeg is installed and in PATH)
+        
         ffmpeg_command = [
             ffmpeg_path,  
             "-i", input_file,        # Input file
@@ -165,7 +165,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
 
                     # Draw trajectory on the frame
                     for i in range(1, len(accumulated_positions)):
-                        cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (50, 30, 250), 2)
+                        cv2.line(frame_batch[idx], accumulated_positions[i - 1], accumulated_positions[i], (50, 30, 250), 3)
                     if accumulated_positions:
                         cv2.circle(frame_batch[idx], accumulated_positions[-1], 5, (0, 0, 255), -1)
 
@@ -179,7 +179,7 @@ def synthesize_key_frames_with_smooth_trajectory(input_video, output_video, mode
                             if landmarks[start].visibility > 0.5 and landmarks[end].visibility > 0.5:
                                 start_point = (int(landmarks[start].x * width), int(landmarks[start].y * height))
                                 end_point = (int(landmarks[end].x * width), int(landmarks[end].y * height))
-                                cv2.line(frame_batch[idx], start_point, end_point, (0, 50, 255), 2)
+                                cv2.line(frame_batch[idx], start_point, end_point, (0, 255, 0), 2)
 
                     out.write(frame_batch[idx])  # Write the processed frame with pose and traj to output video
 
