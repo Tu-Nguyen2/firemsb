@@ -20,7 +20,15 @@
     line-height: 1.6;
     color: #333;
   }
-  
+  .hero-img {
+    width: 100%; /* Ensures the image stretches across the full width */
+    height: 100%; /* Ensures the image stretches across the full height */
+    object-fit: cover; /* Ensures the image maintains its aspect ratio while covering the entire area */
+    position: absolute; /* Positions it relative to the parent container */
+    top: 0;
+    left: 0;
+    z-index: -1; /* Puts the image behind the content */
+}
 
   
   /* Header */
@@ -61,7 +69,6 @@
   
   /* Hero Section */
   .hero {
-  /*  background-image: url('golf-ai-hero.jpg'); */
     background-size: cover;
     background-position: center;
     color: #fff;
@@ -71,6 +78,7 @@
     align-items: center;
     justify-content: center;
   }
+  
   
   .hero-content {
     max-width: 600px;

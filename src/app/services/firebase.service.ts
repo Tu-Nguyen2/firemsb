@@ -167,4 +167,39 @@ export class FirebaseService {
       );
   }
 
+  updateVideoWtpsByUrl(userId: string, videoUrl: string, wtps: string): Observable<void> {
+    return this.afAuth.authState.pipe(
+      switchMap(user => {
+        if (!user) {
+          return throwError(new Error('User is not authenticated'));
+        }
+  
+        const userId = user.uid;
+        return this.firestore.collection('users').doc(userId)
+          .collection('videos', ref => ref.where('videoprocessedurl', '==', videoUrl).limit(1))
+          .get()
+          .pipe(
+            switchMap(querySnapshot => {
+              if (querySnapshot.empty) {
+                // Try querying by rawvideourl if videoprocessedurl didn't work
+                return this.firestore.collection('users').doc(userId)
+                  .collection('videos', ref => ref.where('rawvideourl', '==', videoUrl).limit(1))
+                  .get();
+              } else {
+                return of(querySnapshot);
+              }
+            }),
+            switchMap(querySnapshot => {
+              if (querySnapshot.empty) {
+                return throwError(new Error('Video not found'));
+              } else {
+                const videoDoc = querySnapshot.docs[0];  // Assuming video URL is unique
+                return from(videoDoc.ref.update({ wtps })); // Update the wtps for the selected video
+              }
+            })
+          );
+      })
+    );
+  }
+
 }

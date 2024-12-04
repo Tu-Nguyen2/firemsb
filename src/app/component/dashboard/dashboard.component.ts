@@ -17,87 +17,82 @@ export class DashboardComponent implements OnInit {
     notes: string; 
     prosText: string; 
     clubType: string;
-  }> = [];  // Array to hold video data with metadata
+  }> = [];
   
-  selectedVideoUrl: string | null = null;  // Store URL of selected video
-  selectedVideoTitle: string | null = null;  // Store title of selected video
-  selectedClubType: string = '';  
+  selectedVideoUrl: string | null = null;
+  selectedVideoTitle: string | null = null;
+  selectedClubType: string = '';
+  notes: string = '';
+  wtps: string = '';
+  userId: string | null = null;
 
-  notes: string = '';  // Store current notes
-  wtps: string = '';  // Store "What the Pros Say"
-  userId: string | null = null;  // Store the current user's ID
-
-
-  prosOptions: string[] = ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5', 'Option 6', 'Option 7', 'Option 8', 'Option 9', 'Option 10'];  
-  selectedProsOptions: boolean[] = Array(10).fill(false);  // Boolean array to track selected options
-  generatedSolutions: string[] = [];  // Placeholder for generated solutions
+  prosOptions: string[] = [
+    'Laid-Off', 'Across the Line', 'Off-Balance Swing', 'Short Swing', 'Over Swing',
+    'Outside Takeaway', 'Inside Takeaway', 'Over the Top', 'Casting', 'All Arms Swing',
+    'Swaying', 'Reverse Pivot', 'Blocking Shots', 'Scooping the Ball',
+    'Locking Your Right/left Knee', 'Locking Your Right/Left Knee at Impact',
+    'Standing Up at Impact', 'Decel', 'Failing to Maintain your Spine Angle', 'Yips'
+  ];
+  selectedProsOptions: boolean[] = new Array(this.prosOptions.length).fill(false);
+  generatedSolutions: { text: string }[] = [];
 
   constructor(
     private firebaseService: FirebaseService,
     private afAuth: AngularFireAuth,
-    private cdRef: ChangeDetectorRef  // ChangeDetectorRef to manually trigger change detection
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to auth state to get the user ID when logged in
     this.afAuth.authState.subscribe(user => {
       if (user) {
-        this.userId = user.uid;  // Get the current user's ID
-        this.getUserVideos();  // Fetch the user's videos after login
+        this.userId = user.uid;
+        this.getUserVideos();
       }
     });
   }
 
-  // Fetch the user's uploaded videos from Firebase
   getUserVideos(): void {
     if (this.userId) {
       this.firebaseService.getUserVideos(this.userId).subscribe((videos) => {
-        // Map each video to ensure url, notes, and prosText are properly set
         this.videoList = videos.map(video => {
-          console.log("Video data from Firebase:", video); // Debugging each video object
           return {
-            url: video.videoprocessedurl || video.rawvideourl || '',  // Fallback to rawvideourl if videoprocessedurl is empty
+            url: video.videoprocessedurl || video.rawvideourl || '',
             title: video.title || 'Untitled Video',
-            notes: video.notes || '',  // Default to empty if not available
-            prosText: video.prosText || '',  // Default to empty if not available
+            notes: video.notes || '',
+            prosText: video.prosText || '',
             clubType: video.clubtype || 'Uncertain'
           };
         });
-        console.log("Videos fetched:", this.videoList);  // Log video list for verification
-        // Trigger change detection to ensure updates are reflected in the view
         this.cdRef.detectChanges();
       }, (error) => {
-        console.error("Error fetching videos:", error);  // Handle error
+        console.error("Error fetching videos:", error);
       });
     }
   }
   
-  // Handle video selection from the dropdown
   onVideoSelected(): void {
-    console.log('Dropdown changed, selected URL:', this.selectedVideoUrl); // Debugging dropdown selection
     const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
+  
     if (selectedVideo) {
+      this.wtps = '';
+      this.generatedSolutions = [];
+      this.selectedProsOptions = new Array(this.prosOptions.length).fill(false);
       this.selectedVideoTitle = selectedVideo.title;
-      this.notes = selectedVideo.notes;  // Load notes from the selected video
-      this.wtps = selectedVideo.prosText;  // Load "What the Pros Say" from the selected video
+      this.notes = selectedVideo.notes;
       this.selectedClubType = selectedVideo.clubType || '';
-
+  
       const clubTypeDropdown = document.getElementById('clubTypeDropdown') as HTMLSelectElement;
       if (clubTypeDropdown) {
-        if (selectedVideo.clubType && selectedVideo.clubType !== 'Uncertain'){
-          clubTypeDropdown.value = selectedVideo.clubType;
-        } else {
-          clubTypeDropdown.value = '';
-        }
+        clubTypeDropdown.value = selectedVideo.clubType && selectedVideo.clubType !== 'Uncertain' ? selectedVideo.clubType : '';
       }
-
     } else {
       this.selectedVideoTitle = null;
       this.notes = '';
       this.wtps = '';
+      this.generatedSolutions = [];
+      this.selectedProsOptions = new Array(this.prosOptions.length).fill(false);
       this.selectedClubType = '';
     }
-    console.log('Selected video URL:', this.selectedVideoUrl, 'Title:', this.selectedVideoTitle); // Verify selection
   }
 
   onClubTypeChange(): void {
@@ -113,15 +108,13 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  
   saveNotes(): void {
     if (this.selectedVideoUrl && this.notes !== '') {
       const videoToUpdate = this.videoList.find(video => video.url === this.selectedVideoUrl);
   
       if (videoToUpdate) {
-        videoToUpdate.notes = this.notes;  // Update the local video object
+        videoToUpdate.notes = this.notes;
   
-        // Pass the userId, selected video URL, and notes to the Firebase service method
         if (this.userId) {
           this.firebaseService.updateVideoNotesByUrl(this.userId, this.selectedVideoUrl, this.notes).subscribe({
             next: () => {
@@ -131,35 +124,61 @@ export class DashboardComponent implements OnInit {
               console.error('Error updating notes:', err);
             }
           });
-        } else {
-          console.log('User ID is not available');
         }
-      } else {
-        console.log('Selected video not found!');
       }
-    } else {
-      console.log('No video selected or notes are empty!');
     }
   }
-  
-  
-  
-  //save notes will update this.notes
 
-// Generate solutions based on selected options
-generateSolutions(): void {
-  const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
-  console.log('Selected options:', selectedOptions); // Debugging
+  generateSolutions(): void {
+    const solutions = [
+      { text: 'Laid-Off: "Alright, if you’re hitting a laid-off position, the club is too flat and across the line at the top of your backswing..."' },
+      { text: 'Across the Line: "When your club gets across the line, it means your hands have gone too far, and the shaft is pointing too much to the right..."' },
+      { text: 'Off-Balance Swing: "An off-balance swing usually happens when you’re leaning too much on one side..."' },
+      { text: 'Short Swing: "A short swing typically means you\'re not completing your backswing..."' },
+      { text: 'Over Swing: "An overswing is when your backswing goes too far..."' },
+      { text: 'Outside Takeaway: "When you take the club too far outside on the takeaway..."' },
+      { text: 'Inside Takeaway: "An inside takeaway can make you over-rotate your body..."' },
+      { text: 'Over the Top: "When you come over the top, you’re swinging down on the ball..."' },
+      { text: 'Casting: "Casting happens when your wrists unhinge too early during the downswing..."' },
+      { text: 'All Arms Swing: "An all-arms swing means you\'re not using your body to generate power..."' },
+      { text: 'Swaying: "Swaying occurs when your weight shifts too much to the back leg..."' },
+      { text: 'Reverse Pivot: "A reverse pivot is when you shift your weight incorrectly during the backswing..."' },
+      { text: 'Blocking Shots: "Blocking shots happen when you’re not turning your body properly..."' },
+      { text: 'Scooping the Ball: "Scooping happens when you try to lift the ball in the air..."' },
+      { text: 'Locking Your Right/Left Knee: "If you lock your right or left knee during your swing..."' },
+      { text: 'Locking Your Right/Left Knee at Impact: "Locking the knee at impact can lead to a loss of power..."' },
+      { text: 'Standing Up at Impact: "When you stand up during impact, you lose your posture..."' },
+      { text: 'Decel: "Deceleration occurs when you slow down too much during the downswing..."' },
+      { text: 'Failing to Maintain Your Spine Angle: "If you fail to maintain your spine angle during the swing..."' },
+      { text: 'Yips: "The yips are often caused by mental stress or tension..."' }
+    ];
+  
+    const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
+    this.generatedSolutions = selectedOptions.map(option => {
+      const solution = solutions.find(sol => sol.text.includes(option));
+      return solution ? { text: solution.text } : { text: '' };
+    });
+  
+    this.wtps = this.generatedSolutions.map(solution => solution.text).join('\n');
 
-  // Example logic: Generate up to 5 placeholder solutions
-  this.generatedSolutions = selectedOptions.map((option, index) => `Solution ${index + 1} for ${option}`).slice(0, 5);
-}
+    const selectedVideo = this.videoList.find(video => video.url === this.selectedVideoUrl);
+    if (selectedVideo && this.selectedVideoUrl) {
+      if (this.userId) {
+        this.firebaseService.updateVideoWtpsByUrl(this.userId, this.selectedVideoUrl, this.wtps)
+          .subscribe({
+            next: () => {
+              console.log('wtps updated successfully!');
+            },
+            error: (err) => {
+              console.error('Error updating wtps:', err);
+            }
+          });
+      }
+    }
+  }
 
-// Save "What the Pros Say" data  
-savePros(): void {
-  const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
-  this.wtps = `Selected options: ${selectedOptions.join(', ')}`;
-  console.log('"What the Pros Say" saved:', this.wtps);
+  savePros(): void {
+    const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
+    this.wtps = `Selected options: ${selectedOptions.join(', ')}`;
+  }
 }
-}
-//generate will reset the field
