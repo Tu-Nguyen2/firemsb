@@ -135,26 +135,26 @@ export class DashboardComponent implements OnInit {
 
   generateSolutions(): void {
     const solutions = [
-      { text: 'Laid-Off: "Alright, if you’re hitting a laid-off position, the club is too flat and across the line at the top of your backswing..."' },
-      { text: 'Across the Line: "When your club gets across the line, it means your hands have gone too far, and the shaft is pointing too much to the right..."' },
-      { text: 'Off-Balance Swing: "An off-balance swing usually happens when you’re leaning too much on one side..."' },
-      { text: 'Short Swing: "A short swing typically means you\'re not completing your backswing..."' },
-      { text: 'Over Swing: "An overswing is when your backswing goes too far..."' },
-      { text: 'Outside Takeaway: "When you take the club too far outside on the takeaway..."' },
-      { text: 'Inside Takeaway: "An inside takeaway can make you over-rotate your body..."' },
-      { text: 'Over the Top: "When you come over the top, you’re swinging down on the ball..."' },
-      { text: 'Casting: "Casting happens when your wrists unhinge too early during the downswing..."' },
-      { text: 'All Arms Swing: "An all-arms swing means you\'re not using your body to generate power..."' },
-      { text: 'Swaying: "Swaying occurs when your weight shifts too much to the back leg..."' },
-      { text: 'Reverse Pivot: "A reverse pivot is when you shift your weight incorrectly during the backswing..."' },
-      { text: 'Blocking Shots: "Blocking shots happen when you’re not turning your body properly..."' },
-      { text: 'Scooping the Ball: "Scooping happens when you try to lift the ball in the air..."' },
-      { text: 'Locking Your Right/Left Knee: "If you lock your right or left knee during your swing..."' },
-      { text: 'Locking Your Right/Left Knee at Impact: "Locking the knee at impact can lead to a loss of power..."' },
-      { text: 'Standing Up at Impact: "When you stand up during impact, you lose your posture..."' },
-      { text: 'Decel: "Deceleration occurs when you slow down too much during the downswing..."' },
-      { text: 'Failing to Maintain Your Spine Angle: "If you fail to maintain your spine angle during the swing..."' },
-      { text: 'Yips: "The yips are often caused by mental stress or tension..."' }
+      { text: 'Laid-Off: Alright, if you are hitting a laid-off position, the club is too flat and across the line at the top of your backswing' },
+      { text: 'Across the Line: When your club gets across the line, it means your hands have gone too far, and the shaft is pointing too much to the right' },
+      { text: 'Off-Balance Swing: An off-balance swing usually happens when you are leaning too much on one side' },
+      { text: 'Short Swing: A short swing typically means you are not completing your backswing' },
+      { text: 'Over Swing: An overswing is when your backswing goes too far' },
+      { text: 'Outside Takeaway: When you take the club too far outside on the takeaway' },
+      { text: 'Inside Takeaway: An inside takeaway can make you over-rotate your body' },
+      { text: 'Over the Top: When you come over the top, you are swinging down on the ball' },
+      { text: 'Casting: Casting happens when your wrists unhinge too early during the downswing' },
+      { text: 'All Arms Swing: An all-arms swing means you are not using your body to generate power' },
+      { text: 'Swaying: Swaying occurs when your weight shifts too much to the back leg' },
+      { text: 'Reverse Pivot: A reverse pivot is when you shift your weight incorrectly during the backswing' },
+      { text: 'Blocking Shots: Blocking shots happen when you are not turning your body properly' },
+      { text: 'Scooping the Ball: Scooping happens when you try to lift the ball in the air' },
+      { text: 'Locking Your Right/Left Knee: If you lock your right or left knee during your swing' },
+      { text: 'Locking Your Right/Left Knee at Impact: Locking the knee at impact can lead to a loss of power' },
+      { text: 'Standing Up at Impact: When you stand up during impact, you lose your posture' },
+      { text: 'Decel: Deceleration occurs when you slow down too much during the downswing' },
+      { text: 'Failing to Maintain Your Spine Angle: If you fail to maintain your spine angle during the swing' },
+      { text: 'Yips: The yips are often caused by mental stress or tension' }
     ];
   
     const selectedOptions = this.prosOptions.filter((_, index) => this.selectedProsOptions[index]);
