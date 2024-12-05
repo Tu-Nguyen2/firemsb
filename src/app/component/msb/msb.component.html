@@ -39,7 +39,28 @@
         <div class="popup-contents">
             <span class="close-button" (click)="closeTipsPopup()">&times;</span>
             <h2><b>Tips for a Good Upload</b></h2>
-            <p>Do this and do that</p>
+            <ol class="tips-list">
+                <li>
+                  <p><b>Fill in handedness in the profile section.</b></p>
+                </li>
+                <li>
+                  <p><b>Video framing and clipping:</b></p>
+                  <div class="tips-images-container">
+                    
+                    <div class="tip">
+                      <label for="poseFraming">Good Video Framing:</label>
+                      <img src="poseFraming.png" id="poseFraming" class="tip-image">
+                      <p class="tip-note">The camera should be set up 10-15 feet from where the player is standing (further for drivers and taller players).</p>
+                    </div>
+
+                    <div class="tip">
+                      <label for="endPose">Good Last Frame:</label>
+                      <img src="endPose.png" id="endPose" class="tip-image">
+                      <p class="tip-note">End clips after impact with the ball and before the start of follow-through for the best results.</p>
+                    </div>
+                  </div>
+                </li>
+              </ol>
         </div>
     </div>
 </body>
