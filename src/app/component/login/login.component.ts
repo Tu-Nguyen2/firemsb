@@ -18,7 +18,7 @@ export class LoginComponent {
     try {
       await this.authService.login(this.email, this.password);
       
-      this.router.navigate(['/msb']);
+      this.router.navigate(['/dashboard']);
     } catch (error: any) {
       console.error('Login failed:', error.message);
       this.errorMessage = error.message || 'Login failed, please check credentials'; // Display the error message to the user
